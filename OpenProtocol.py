@@ -16,7 +16,7 @@ class OpenProtocol:
         self.t_recvMsg.start()
 
         # parameter
-        
+        self.cluster_number = None
 
     def recv_filter(self, recv_msg):
         recv_msg = recv_msg.decode('ascii')
@@ -28,15 +28,18 @@ class OpenProtocol:
         send_msg = send_msg.encode('ascii')
         self.conn.send(send_msg)
 
+    def msg_operation(self, msg):
+        print(msg)
+
     def recv_msg(self):
         while self.isClose is not True:
             recv_msg = self.conn.recv(1024)
             if recv_msg:
                 recv_msg = self.recv_filter(recv_msg)
-                print(recv_msg)
-                if recv_msg[1] is not None:
-                    if recv_msg[1] == self.dataInfo.isCommunication_stop:
-                        self.close()
+                self.msg_operation(recv_msg)
+                # if recv_msg[1] is not None:
+                #     if recv_msg[1] == self.dataInfo.isCommunication_stop:
+                #         self.close()
 
     def close(self):
         self.isClose = True
