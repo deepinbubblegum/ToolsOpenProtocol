@@ -1,6 +1,18 @@
 class Data_info:
     def __init__(self):
+        self.isCommunication_start_acknowledge = '0002'
         self.isCommunication_stop = '0003\x00'
+        self.isLast_tightening_result_data_acknowledge = '0062'
+        self.isLast_tightening_result_data_upload_reply = '0061'
+        self.isLinking_Group_restart = '0039'
+        self.isTime_upload_reply = '0081'
+        self.isCell_Id = '01' # data pack 4 byte
+        self.isChannel_Id = '02' # data pack 2 byte
+        self.isController_Name = '03'
+        self.isSupplier_code = '04'
+        self.isLock_at_batch_done_unsubscribe = '0024'
+        self.isCommand_accepted = '0005'
+        self.isCommand_Error = '0004'
         self.data_info = {
             '0000': '',
             '0001': 'Communication start',

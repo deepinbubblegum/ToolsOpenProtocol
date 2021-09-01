@@ -16,6 +16,15 @@ class cmd_OpenProtocol:
         strAns = strAns[-4:len(strAns)]
         strAns += (strHeader + '\0')
         return strAns
+    
+    # 0010:Application ID upload request
+    def Application_ID_upload_request(self):
+        strHeader = '0010001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
 
     # 0014:Application selected subscribe
     def Application_selected_subscribe(self):
@@ -36,9 +45,10 @@ class cmd_OpenProtocol:
         return strAns
 
     # 0018:Select Application
-    def Select_Application(self):
+    def Select_Application(self, strAppNo):
         strHeader = '0018001000000000'
-        strData = ''
+        strData = strAppNo
+        strHeader += strData
         strAns = "00000000" + str(len(strHeader) + 4)
         strAns = strAns[-4:len(strAns)]
         strAns += (strHeader + '\0')
