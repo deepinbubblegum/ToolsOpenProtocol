@@ -16,6 +16,7 @@ def main():
     ]
     open = OpenProtocol(HOST, PORT_TOOL[4])
     cmd = cmd_OpenProtocol()
+
     while True:
         try:
             if open.send_msg(cmd.Application_ID_upload_request()) is not True:

@@ -30,6 +30,9 @@ class OpenProtocol:
 
         print('Created Threading recive pcakage.')
         
+        self.Data = {}
+        # self.Data_old = {}
+        
         # parameter and flag
         self.online = False
 
@@ -57,7 +60,7 @@ class OpenProtocol:
 
     def send_msg(self, send_msg):
         try:
-            time.sleep(1)
+            time.sleep(0.01)
             send_msg = send_msg.encode('ascii')
             self.conn.sendall(send_msg)
             return True
@@ -147,18 +150,30 @@ class OpenProtocol:
             self.Date_time_last_change_App_settings = datetime.strptime(msg[197:216], '%Y-%m-%d:%H:%M:%S')
             self.Batch_status = msg[218:219] #0=batch NOK (batch notcompleted), 1=batch OK, 2=batch not used.
             self.Tightening_ID = msg[221:231]
+            self.Data = {
+                'Rev_num_msg': self.Rev_num_msg, 'No_ack_flag' : self.No_ack_flag, 'Cell_id': self.Cell_id,
+                'Channel_id' : self.Channel_id, 'Controller_Name': self.Controller_Name, 'VIN_Number': self.VIN_Number,
+                'Linking_Group_ID' : self.Linking_Group_ID, 'Application_ID' : self.Application_ID, 'Batch_size' : self.Batch_size,
+                'Batch_counter' : self.Batch_counter, 'Tightening_Status' : self.Tightening_Status, 'Torque_status': self.Torque_status,
+                'Angle_status' : self.Angle_status, 'Torque_Min_limit' : self.Torque_Min_limit, 'Torque_Max_limit' : self.Torque_Max_limit,
+                'Torque_final_targe' : self.Torque_final_targe, 'Torque' : self.Torque, 'Angle_Min' : self.Angle_Min, 'Angle_Max' : self.Angle_Max,
+                'Final_Angle_Target' : self.Final_Angle_Target, 'Angle' : self.Angle, 'Time_stamp' : self.Time_stamp, 'Date_time_last_change_App_settings' : self.Date_time_last_change_App_settings,
+                'Batch_status' : self.Batch_status, 'Tightening_ID' : self.Tightening_ID
+            }
             self.res_result_data_acknowledge()
+            print(self.Data)
         
         elif recv_mid == '0011':
         # 002900110010        002001002
             self.Rev_num_msg = msg[8:11]
             self.No_ack_flag = msg[11:12]
             self.Number_of_valid_Application = msg[20:23]
-            self.Application_numbers_of_the_torque_controller = msg[23: 23 + (3 * self.Number_of_valid_Application)]
-            print(msg)
-            print(self.Application_numbers_of_the_torque_controller)
+            self.Application_numbers_of_the_torque_controller = msg[23: 23 + (3 * int(self.Number_of_valid_Application))]
         elif recv_mid:
             print(msg)
+      
+    def GetData(self):
+        return self.Data
       
     def recv_msg(self):
         while self.isClose is not True:
@@ -166,9 +181,12 @@ class OpenProtocol:
                 recv_msg = self.conn.recv(1024)
                 if recv_msg:
                     recv_msg = self.recv_filter(recv_msg)
-                    self.msg_operation(recv_msg)
+                    thread = threading.Thread(target=self.msg_operation, args=(recv_msg,))
+                    thread.daemon = True
+                    thread.start()
             except Exception as e:
                 pass
+            time.sleep(0.001)
             
     def get_recv(self):
         if self.deque:
