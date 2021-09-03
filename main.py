@@ -1,36 +1,57 @@
-import socket
-import threading
-import time
-from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
-from opensystem.OpenProtocol import OpenProtocol
+import sys
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtCore import * 
+from qt_material import apply_stylesheet
 
+class Window(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        # this will hide the title bar
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        
+        self.setWindowTitle("GUI Manager")
+        self.setGeometry(100, 100, 720, 480)
+        self.setWindowIcon(QIcon('icons/qt.png'))
+        
+        # calling method
+        self.UiComponents()
+        
+        # showing all the widgets
+        self.show()
+        
+    # method for widgets
+    def UiComponents(self):
+        # creating label
+        label = QLabel("Label", self)
+  
+        # setting geometry to label
+        label.setGeometry(100, 100, 120, 40)
+  
+        # adding border to label
+        label.setStyleSheet(
+            "border : 2px solid black;"
+            "border-radius: 8px"
+        )
+  
+        # opening window in maximized size
+        # self.showMaximized()
+        
+print(__name__)
+     
 def main():
-    HOST = '10.1.10.22'
-    PORT_TOOL = [
-        9001, 9002, 9003, 9004,
-        9005, 9006, 9007, 9008,
-        9009, 9010, 9011, 9012,
-        9013, 9014, 9015, 9016
-    ]
-    # OpenProtocol.OpenProtocol(host, port)
-    open = OpenProtocol(HOST, PORT_TOOL[4])
-    cmd = cmd_OpenProtocol()
-
-    while True:
-        try:
-            if open.send_msg(cmd.Linking_Group_info_subscribe()) is not True:
-                continue
-            # if open.send_msg(cmd.Application_ID_upload_request()) is not True:
-            #     continue
-            # if open.send_msg(cmd.Time_upload_request()) is not True:
-                # continue
-            if open.send_msg(cmd.Enable_tool()) is not True:
-                continue
-            if open.send_msg(cmd.Last_tightening_result_data_subscribe()) is not True:
-                continue
-        except Exception as err:
-            print(err)
-
-
+# try:
+    # create the application and the main window
+    print('bca')
+    app = QApplication(sys.argv)
+    window = Window()
+    apply_stylesheet(app, theme='dark_blue.xml')
+    
+    # # run
+    # window.show()
+# finally:
+    # start the app
+    sys.exit(app.exec())
+        
 if __name__ == '__main__':
     main()
