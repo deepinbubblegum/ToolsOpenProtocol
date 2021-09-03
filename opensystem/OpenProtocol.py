@@ -2,9 +2,9 @@ import socket
 import threading
 import time
 from datetime import datetime
-from cmd_OpenProtocol import cmd_OpenProtocol
-from data_info import Data_info
-from collections import deque
+from collections import deque 
+from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
+from opensystem.data_info import Data_info
 
 class OpenProtocol:
     def __init__(self, host, port):
@@ -76,6 +76,10 @@ class OpenProtocol:
     def res_Vehicle_Id_Number_upload_acknowledge(self):
         self.VIN_upload_subscribe = True
         self.send_msg(self.cmd.Vehicle_Id_Number_upload_acknowledge())
+        
+    def res_Linking_Group_info_acknowledge(self):
+        self.Linking_Group_info_acknowledge = True
+        self.send_msg(self.cmd.Linking_Group_info_acknowledge())
 
     def msg_operation(self, msg):
         recv_mid = msg[4:8]
@@ -137,6 +141,11 @@ class OpenProtocol:
                 self.Rev_num_msg = msg[8:11]
                 self.No_ack_flag = msg[11:12]
             
+            elif msg_not_accept == '0034':
+                self.Linking_Group_info_acknowledge = False
+                self.Rev_num_msg = msg[8:11]
+                self.No_ack_flag = msg[11:12]
+            
             elif msg_not_accept:
                 print('msg_not_accepted : ', msg)
                 self.Rev_num_msg = msg[8:11]
@@ -189,7 +198,13 @@ class OpenProtocol:
                 'Batch_status' : self.Batch_status, 'Tightening_ID' : self.Tightening_ID
             }
             self.res_result_data_acknowledge()
-            print(self.Data)
+            # print(self.Data)
+            
+        elif recv_mid == '0035':
+            self.Rev_num_msg = msg[8:11]
+            self.No_ack_flag = msg[11:12]
+            print(msg)
+            self.res_Linking_Group_info_acknowledge()
         
         elif recv_mid == '0011':
         # 002900110010        002001002
