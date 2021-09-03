@@ -19,10 +19,12 @@ def main():
 
     while True:
         try:
-            if open.send_msg(cmd.Application_ID_upload_request()) is not True:
+            if open.send_msg(cmd.Vehicle_Id_Number_upload_subscribe()) is not True:
                 continue
-            if open.send_msg(cmd.Time_upload_request()) is not True:
-                continue
+            # if open.send_msg(cmd.Application_ID_upload_request()) is not True:
+            #     continue
+            # if open.send_msg(cmd.Time_upload_request()) is not True:
+                # continue
             if open.send_msg(cmd.Enable_tool()) is not True:
                 continue
             if open.send_msg(cmd.Last_tightening_result_data_subscribe()) is not True:

@@ -90,9 +90,27 @@ class cmd_OpenProtocol:
         strAns += (strHeader + '\0')
         return strAns
 
+    # 0050:Vehicle Id Number download request
+    def Vehicle_Id_Number_download_request(self):
+        strHeader = '0050001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
+
     # 0051:Vehicle Id Number upload subscribe
     def Vehicle_Id_Number_upload_subscribe(self):
         strHeader = '0051001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
+
+    # 0052:Vehicle Id Number upload
+    def Vehicle_Id_Number_upload(self):
+        strHeader = '0052001000000000'
         strData = ''
         strAns = "00000000" + str(len(strHeader) + 4)
         strAns = strAns[-4:len(strAns)]

@@ -72,6 +72,10 @@ class OpenProtocol:
     def res_result_data_acknowledge(self):
         self.Last_result_data_subscribe = True
         self.send_msg(self.cmd.Last_tightening_result_data_acknowledge())
+    
+    def res_Vehicle_Id_Number_upload_acknowledge(self):
+        self.VIN_upload_subscribe = True
+        self.send_msg(self.cmd.Vehicle_Id_Number_upload_acknowledge())
 
     def msg_operation(self, msg):
         recv_mid = msg[4:8]
@@ -100,6 +104,12 @@ class OpenProtocol:
                 self.Enable_tools = False
                 self.Rev_num_msg = msg[8:11]
                 self.No_ack_flag = msg[11:12]
+            elif msg_accepted == '0051': #Vehicle Id Number upload subscribe CMD accepted
+                # 002400050010        0051
+                self.VIN_upload_subscribe = True
+                self.Rev_num_msg = msg[8:11]
+                self.No_ack_flag = msg[11:12]
+                
             elif msg_accepted == '0060': # Last tightening result data subscribe CMD accepted
             # example recv 002400050010        0060
                 self.Last_result_data_subscribe = True
@@ -116,13 +126,31 @@ class OpenProtocol:
                 self.Rev_num_msg = msg[8:11]
                 self.No_ack_flag = msg[11:12]
                 
+            elif msg_not_accept == '0051':
+                self.VIN_upload_subscribe = False
+                self.Rev_num_msg = msg[8:11]
+                self.No_ack_flag = msg[11:12]
+                
             elif msg_not_accept == '0060': # Last tightening result data subscribe CMD not accepted
             # example recv 002600040010        006009
                 self.Last_result_data_subscribe = False
                 self.Rev_num_msg = msg[8:11]
                 self.No_ack_flag = msg[11:12]
+            
             elif msg_not_accept:
                 print('msg_not_accepted : ', msg)
+                self.Rev_num_msg = msg[8:11]
+                self.No_ack_flag = msg[11:12]
+        
+        elif recv_mid == '0052':
+            self.Rev_num_msg = msg[8:11]
+            self.No_ack_flag = msg[11:12]
+            self.VIN_Number_CODE = msg[20:45]
+            # select Enter ID CODE
+            print(self.VIN_Number_CODE)
+            self.res_Vehicle_Id_Number_upload_acknowledge()
+            
+        
         elif recv_mid == '0061':
             # example recv 023100610010        010000020503                         041234                     050106002070005080001091101111120000001300130014000000150000001600010170037018003601900361202021-09-01:16:00:42212021-08-31:18:00:54220230000000266
             self.Rev_num_msg = msg[8:11]
