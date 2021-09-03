@@ -30,7 +30,7 @@ class Window(QMainWindow):
   
         # adding border to label
         label.setStyleSheet(
-            "border : 2px solid black;"
+            "border : 1px solid black;"
             "border-radius: 8px"
         )
   
