@@ -1,7 +1,7 @@
 import sys
-from PySide6.QtWidgets import *
-from PySide6.QtGui import *
-from PySide6.QtCore import * 
+from PySide2.QtWidgets import *
+from PySide2.QtGui import *
+from PySide2.QtCore import * 
 from qt_material import apply_stylesheet
 
 class Window(QMainWindow):
@@ -51,7 +51,7 @@ def main():
     # window.show()
 # finally:
     # start the app
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
         
 if __name__ == '__main__':
     main()
