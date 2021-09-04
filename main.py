@@ -18,24 +18,21 @@ class Window(QMainWindow):
         self.UiComponents()
         
         # showing all the widgets
-        self.showFullScreen()
+        self.show()
+        # self.showFullScreen()
         
     # method for widgets
     def UiComponents(self):
-        # creating label
-        label = QLabel("Label", self)
-  
-        # setting geometry to label
-        label.setGeometry(100, 100, 120, 40)
-  
-        # adding border to label
-        label.setStyleSheet(
-            "border : 1px solid black;"
-            "border-radius: 8px"
-        )
+        pass
+        # # adding border to label
+        # label.setStyleSheet(
+        #     "border : 1px solid black;"
+        #     "border-radius: 8px"
+        # )
   
         # opening window in maximized size
         # self.showMaximized()
+    
          
 def main():
 # try:
