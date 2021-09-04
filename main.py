@@ -18,8 +18,8 @@ class Window(QMainWindow):
         self.UiComponents()
         
         # showing all the widgets
-        self.show()
-        # self.showFullScreen()
+        # self.show()
+        self.showFullScreen()
         
     # method for widgets
     def UiComponents(self):
@@ -31,7 +31,7 @@ class Window(QMainWindow):
         # )
   
         # opening window in maximized size
-        # self.showMaximized()
+        # self.showFullScreen()
     
          
 def main():
@@ -42,7 +42,7 @@ def main():
     apply_stylesheet(app, theme='dark_blue.xml')
     
     # # run
-    window.show()
+    window.showFullScreen()
 # finally:
     # start the app
     sys.exit(app.exec_())
