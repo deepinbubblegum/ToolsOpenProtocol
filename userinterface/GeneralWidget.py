@@ -159,7 +159,14 @@ class GeneralWidget(QWidget):
 
     def getDataStep(self, value):
         print('getDataStep')
+        self.table.clear()
         SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1'
         res_step = QuerySQL(SQL_txt)
-        for row in res_step:
-            print(row)
+        table_i = 0
+        table_j = 0
+        self.table.setColumnCount(5)
+        self.table.setRowCount(1)
+
+        for i, rows in enumerate(res_step):
+            for j, col in enumerate(rows):
+                self.table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
