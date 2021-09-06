@@ -7,9 +7,25 @@ from PyQt5.QtCore import *
 from subprocess import call
 from qtwidgets import Toggle, AnimatedToggle
 
+import sqlite3
+
+def QuerySQL(SQL):
+    conn = sqlite3.connect('./database/openprotocol.db')
+    cur = conn.cursor()
+    cur.execute(SQL)
+    res_data = cur.fetchall()
+    conn.commit()
+    conn.close()
+    return res_data
+
 class GeneralWidget(QWidget):
     def __init__(self, parent=None):
         super(GeneralWidget, self).__init__(parent)
+       
+
+        SQL_txt = 'SELECT * FROM Tools'
+        res_tools = QuerySQL(SQL_txt)
+
         VLayout = QVBoxLayout(self)
         HLayout1 = QHBoxLayout()
         HLayout2 = QHBoxLayout()
@@ -26,6 +42,9 @@ class GeneralWidget(QWidget):
 
         label_Tools = QLabel("Tools :")
         combo_Tools = QComboBox(self)
+        for row in res_tools:
+            combo_Tools.addItem(row[1])
+
 
         toggle_ByPass = AnimatedToggle(
             checked_color="#FFB000",
@@ -33,6 +52,11 @@ class GeneralWidget(QWidget):
         )
         toggle_ByPass.adjustSize()
         label_ByPass = QLabel("By Pass :")
+
+        SQL_txt = 'SELECT * FROM Link'
+        res_link = QuerySQL(SQL_txt)
+        for row in res_link:
+            print(row)
 
         label_Link_ID = QLabel("Link ID :")
         combo_Link_ID = QComboBox(self)
@@ -48,7 +72,7 @@ class GeneralWidget(QWidget):
 
         table = QTableWidget(self)
         table.setColumnCount(4)
-        table.setRowCount(50)
+        table.setRowCount(5)
         # Set the table headers
         table.setHorizontalHeaderLabels(["STEP ID", "TRAY ID", "SOCKET ID", "COMMAND"])
         table.setAlternatingRowColors(True)
@@ -59,10 +83,9 @@ class GeneralWidget(QWidget):
         # table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
         # Set the table values
-        for i in range(50):
+        for i in range(1):
             for j in range(4) :
-                table.setItem(i, j, QTableWidgetItem("Row-" + str(i+1) + " , Col-" + str(j+1)))
-        # Resize of the rows and columns based on the content
-        table.resizeColumnsToContents()
-        table.resizeRowsToContents()
-        HLayout3.addWidget(table , 1)
+                table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
+        
+        HLayout3.addWidget(table)
+
