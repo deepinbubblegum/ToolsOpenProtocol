@@ -59,6 +59,7 @@ class GeneralWidget(QWidget):
 
         label_Link_ID = QLabel("Link ID :")
         self.combo_Link_ID = QComboBox(self)
+        self.combo_Link_ID.currentIndexChanged.connect(self.on_combo_Link_changed)
 
         HLayout2.addWidget(label_Tools)
         HLayout2.addWidget(self.combo_Tools, 3)
@@ -91,39 +92,40 @@ class GeneralWidget(QWidget):
         self.onlyInt = QIntValidator()
 
         label_addStep = QLabel("Step :")
-        editText_addStep = QLineEdit(self)
-        editText_addStep.setValidator(self.onlyInt)
+        self.editText_addStep = QLineEdit(self)
+        self.editText_addStep.setValidator(self.onlyInt)
 
         label_addTRAY = QLabel("TRAY ID :")
         self.combo_addTRAY = QComboBox(self)
 
         label_addSocket = QLabel("SOCKET ID :")
-        combo_addSocket = QComboBox(self)
+        self.combo_addSocket = QComboBox(self)
 
         addButton = QPushButton("Add Step")
+        addButton.clicked.connect(self.on_click_addStep)
 
         HLayout4.addWidget(label_addStep)
-        HLayout4.addWidget(editText_addStep, 1)
+        HLayout4.addWidget(self.editText_addStep, 1)
 
         HLayout4.addWidget(label_addTRAY)
         HLayout4.addWidget(self.combo_addTRAY, 1)
 
         HLayout4.addWidget(label_addSocket)
-        HLayout4.addWidget(combo_addSocket, 1)
+        HLayout4.addWidget(self.combo_addSocket, 1)
 
         HLayout4.addWidget(addButton)
         
         # init sql
         self.Link_QuerySQL(0)
+        self.GetDataSocket(1)
         self.GetDataTRAY()
 
-    def Link_QuerySQL(self, value):
-        self.combo_Link_ID.clear()
-        value = value + 1
-        SQL_txt = 'SELECT * FROM Link WHERE ID_Tools_link = ' + str(value)
-        res_link = QuerySQL(SQL_txt)
-        for row in res_link:
-            self.combo_Link_ID.addItem(str(row[1]))
+    def GetDataSocket(self, value):
+        self.combo_addSocket.clear()
+        SQL_txt = 'SELECT * FROM Socket WHERE Socket_Tray_ID = ' + str(value)
+        res_socket = QuerySQL(SQL_txt)
+        for row in res_socket:
+            self.combo_addSocket.addItem(str(row[1]))
 
     def GetDataTRAY(self):
         self.combo_addTRAY.clear()
@@ -137,4 +139,27 @@ class GeneralWidget(QWidget):
 
     def on_combo_Link_changed(self, value):
         value = value + 1
-        print(value)
+        # print(value)
+        self.getDataStep(value)
+
+    def Link_QuerySQL(self, value):
+        self.combo_Link_ID.clear()
+        value = value + 1
+        SQL_txt = 'SELECT * FROM Link WHERE ID_Tools_link = ' + str(value)
+        res_link = QuerySQL(SQL_txt)
+        for row in res_link:
+            self.combo_Link_ID.addItem(str(row[1]))
+
+    @pyqtSlot()
+    def on_click_addStep(self):
+        stepNumber = self.editText_addStep.text()
+        stepTRAY = str(self.combo_addTRAY.currentText())
+        stepSocket = str(self.combo_addSocket.currentText())
+        self.editText_addStep.clear()
+
+    def getDataStep(self, value):
+        print('getDataStep')
+        SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1'
+        res_step = QuerySQL(SQL_txt)
+        for row in res_step:
+            print(row)
