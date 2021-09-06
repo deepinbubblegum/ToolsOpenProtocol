@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import * 
 from qt_material import apply_stylesheet
+from userinterface.TabsPage import TabsWidget
 
 class Window(QMainWindow):
     def __init__(self):
@@ -14,9 +15,18 @@ class Window(QMainWindow):
         self.setGeometry(100, 100, 720, 480)
         self.setWindowIcon(QIcon('icons/qt.png'))
         
+        # calling method
+        self.UiComponents()
+        
         # showing all the widgets
         # self.show()
-        self.showFullScreen()
+        # self.showFullScreen()
+        
+    # method for widgets
+    def UiComponents(self):
+        self.tabs_widget = TabsWidget(self)
+        self.setCentralWidget(self.tabs_widget)
+    
          
 def main():
 # try:
