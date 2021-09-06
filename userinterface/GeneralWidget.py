@@ -30,8 +30,10 @@ class GeneralWidget(QWidget):
         HLayout1 = QHBoxLayout()
         HLayout2 = QHBoxLayout()
         HLayout3 = QHBoxLayout()
+        HLayout4 = QHBoxLayout()
         VLayout.addLayout(HLayout1)
         VLayout.addLayout(HLayout2)
+        VLayout.addLayout(HLayout4)
         VLayout.addLayout(HLayout3)
         VLayout.addStretch()
 
@@ -71,7 +73,7 @@ class GeneralWidget(QWidget):
         self.table.setColumnCount(4)
         self.table.setRowCount(5)
         # Set the table headers
-        self.table.setHorizontalHeaderLabels(["STEP ID", "TRAY ID", "SOCKET ID", "COMMAND"])
+        self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
         self.table.setAlternatingRowColors(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
@@ -86,9 +88,34 @@ class GeneralWidget(QWidget):
         
         HLayout3.addWidget(self.table)
 
-        # init sql
-        self.Link_QuerySQL(1)
+        self.onlyInt = QIntValidator()
 
+        label_addStep = QLabel("Step :")
+        editText_addStep = QLineEdit(self)
+        editText_addStep.setValidator(self.onlyInt)
+
+        label_addTRAY = QLabel("TRAY ID :")
+        self.combo_addTRAY = QComboBox(self)
+
+        label_addSocket = QLabel("SOCKET ID :")
+        combo_addSocket = QComboBox(self)
+
+        addButton = QPushButton("Add Step")
+
+        HLayout4.addWidget(label_addStep)
+        HLayout4.addWidget(editText_addStep, 1)
+
+        HLayout4.addWidget(label_addTRAY)
+        HLayout4.addWidget(self.combo_addTRAY, 1)
+
+        HLayout4.addWidget(label_addSocket)
+        HLayout4.addWidget(combo_addSocket, 1)
+
+        HLayout4.addWidget(addButton)
+        
+        # init sql
+        self.Link_QuerySQL(0)
+        self.GetDataTRAY()
 
     def Link_QuerySQL(self, value):
         self.combo_Link_ID.clear()
@@ -96,7 +123,14 @@ class GeneralWidget(QWidget):
         SQL_txt = 'SELECT * FROM Link WHERE ID_Tools_link = ' + str(value)
         res_link = QuerySQL(SQL_txt)
         for row in res_link:
-            self.combo_Link_ID.addItem(row[1])
+            self.combo_Link_ID.addItem(str(row[1]))
+
+    def GetDataTRAY(self):
+        self.combo_addTRAY.clear()
+        SQL_txt = 'SELECT * FROM TRAY'
+        res_tray = QuerySQL(SQL_txt)
+        for row in res_tray:
+            self.combo_addTRAY.addItem(str(row[1]))
 
     def on_combo_Tools_changed(self, value):
         self.Link_QuerySQL(value)
