@@ -44,7 +44,9 @@ class GeneralWidget(QWidget):
         combo_Tools = QComboBox(self)
         for row in res_tools:
             combo_Tools.addItem(row[1])
-
+            
+        combo_Tools.currentIndexChanged.connect(self.on_combo_Tools_changed)
+        combo_Tools.setCurrentIndex(0)
 
         toggle_ByPass = AnimatedToggle(
             checked_color="#FFB000",
@@ -89,3 +91,6 @@ class GeneralWidget(QWidget):
         
         HLayout3.addWidget(table)
 
+    def on_combo_Tools_changed(self, value):
+        value = value + 1
+        print(value)
