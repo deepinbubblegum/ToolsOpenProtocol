@@ -156,10 +156,9 @@ class OpenProtocol:
             self.No_ack_flag = msg[11:12]
             self.VIN_Number_CODE = msg[20:45]
             # select Enter ID CODE
-            print(self.VIN_Number_CODE)
+            # print(self.VIN_Number_CODE)
             self.res_Vehicle_Id_Number_upload_acknowledge()
             
-        
         elif recv_mid == '0061':
             # example recv 023100610010        010000020503                         041234                     050106002070005080001091101111120000001300130014000000150000001600010170037018003601900361202021-09-01:16:00:42212021-08-31:18:00:54220230000000266
             self.Rev_num_msg = msg[8:11]
