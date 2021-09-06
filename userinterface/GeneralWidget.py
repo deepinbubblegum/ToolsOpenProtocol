@@ -77,7 +77,8 @@ class GeneralWidget(QWidget):
         self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
         self.table.setAlternatingRowColors(True)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
+        self.table.resizeColumnsToContents()
+        self.table.resizeRowsToContents()
         # table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         # table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         # table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
@@ -159,7 +160,6 @@ class GeneralWidget(QWidget):
 
     def getDataStep(self, value):
         print('getDataStep')
-        self.table.clear()
         SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1'
         res_step = QuerySQL(SQL_txt)
         table_i = 0
