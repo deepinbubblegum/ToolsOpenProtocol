@@ -41,12 +41,12 @@ class GeneralWidget(QWidget):
         HLayout1.addWidget(editText_IPAddress)
 
         label_Tools = QLabel("Tools :")
-        combo_Tools = QComboBox(self)
+        self.combo_Tools = QComboBox(self)
         for row in res_tools:
-            combo_Tools.addItem(row[1])
+            self.combo_Tools.addItem(row[1])
             
-        combo_Tools.currentIndexChanged.connect(self.on_combo_Tools_changed)
-        combo_Tools.setCurrentIndex(0)
+        self.combo_Tools.currentIndexChanged.connect(self.on_combo_Tools_changed)
+        self.combo_Tools.setCurrentIndex(0)
 
         toggle_ByPass = AnimatedToggle(
             checked_color="#FFB000",
@@ -55,30 +55,25 @@ class GeneralWidget(QWidget):
         toggle_ByPass.adjustSize()
         label_ByPass = QLabel("By Pass :")
 
-        SQL_txt = 'SELECT * FROM Link'
-        res_link = QuerySQL(SQL_txt)
-        for row in res_link:
-            print(row)
-
         label_Link_ID = QLabel("Link ID :")
-        combo_Link_ID = QComboBox(self)
+        self.combo_Link_ID = QComboBox(self)
 
         HLayout2.addWidget(label_Tools)
-        HLayout2.addWidget(combo_Tools, 3)
+        HLayout2.addWidget(self.combo_Tools, 3)
 
         HLayout2.addWidget(label_ByPass)
         HLayout2.addWidget(toggle_ByPass)
 
         HLayout2.addWidget(label_Link_ID)
-        HLayout2.addWidget(combo_Link_ID, 1)
+        HLayout2.addWidget(self.combo_Link_ID, 1)
 
-        table = QTableWidget(self)
-        table.setColumnCount(4)
-        table.setRowCount(5)
+        self.table = QTableWidget(self)
+        self.table.setColumnCount(4)
+        self.table.setRowCount(5)
         # Set the table headers
-        table.setHorizontalHeaderLabels(["STEP ID", "TRAY ID", "SOCKET ID", "COMMAND"])
-        table.setAlternatingRowColors(True)
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.setHorizontalHeaderLabels(["STEP ID", "TRAY ID", "SOCKET ID", "COMMAND"])
+        self.table.setAlternatingRowColors(True)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         # table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         # table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
@@ -87,10 +82,25 @@ class GeneralWidget(QWidget):
         # Set the table values
         for i in range(1):
             for j in range(4) :
-                table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
+                self.table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
         
-        HLayout3.addWidget(table)
+        HLayout3.addWidget(self.table)
+
+        # init sql
+        self.Link_QuerySQL(1)
+
+
+    def Link_QuerySQL(self, value):
+        self.combo_Link_ID.clear()
+        value = value + 1
+        SQL_txt = 'SELECT * FROM Link WHERE ID_Tools_link = ' + str(value)
+        res_link = QuerySQL(SQL_txt)
+        for row in res_link:
+            self.combo_Link_ID.addItem(row[1])
 
     def on_combo_Tools_changed(self, value):
+        self.Link_QuerySQL(value)
+
+    def on_combo_Link_changed(self, value):
         value = value + 1
         print(value)
