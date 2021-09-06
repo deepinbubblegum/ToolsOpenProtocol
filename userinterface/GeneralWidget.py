@@ -5,29 +5,42 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from subprocess import call
+from qtwidgets import Toggle, AnimatedToggle
 
 class GeneralWidget(QWidget):
     def __init__(self, parent=None):
         super(GeneralWidget, self).__init__(parent)
-        lay = QVBoxLayout(self)
-        # Buttons
-        button_start = QPushButton("start") #self.lang["btn_start"])
-        button_stop = QPushButton("stop") #self.lang["btn_stop"])
+        VLayout = QVBoxLayout(self)
+        HLayout1 = QHBoxLayout()
+        HLayout2 = QHBoxLayout()
+        VLayout.addLayout(HLayout1)
+        VLayout.addLayout(HLayout2)
+        VLayout.addStretch()
 
-        # Button Extra
-        button_start.setToolTip("This is a tooltip for the button!")    # Message to show when mouse hover
-        button_start.clicked.connect(self.on_click)
+        label_IPAddress = QLabel("IP Address :")
+        editText_IPAddress = QLineEdit(self)
+        HLayout1.addWidget(label_IPAddress)
+        HLayout1.addWidget(editText_IPAddress)
 
-        button_stop.clicked.connect(self.on_click)
+        label_Tools = QLabel("Tools :")
+        combo_Tools = QComboBox(self)
 
-        lay.addWidget(button_start)
-        lay.addWidget(button_stop)
-        lay.addStretch()
+        toggle_ByPass = AnimatedToggle(
+            checked_color="#FFB000",
+            pulse_checked_color="#44FFB000"
+        )
+        toggle_ByPass.adjustSize()
+        label_ByPass = QLabel("By Pass :")
 
-    @pyqtSlot()
-    def on_click(self):
-        button = self.sender().text()
-        if button == self.lang["btn_start"]:
-            print("Dank")
-        elif button == self.lang["btn_stop"]:
-            print("Not dank")
+        label_Link_ID = QLabel("Link ID :")
+        combo_Link_ID = QComboBox(self)
+
+        HLayout2.addWidget(label_Tools)
+        HLayout2.addWidget(combo_Tools, 3)
+
+        HLayout2.addWidget(label_ByPass)
+        HLayout2.addWidget(toggle_ByPass)
+
+        HLayout2.addWidget(label_Link_ID)
+        HLayout2.addWidget(combo_Link_ID, 1)
+
