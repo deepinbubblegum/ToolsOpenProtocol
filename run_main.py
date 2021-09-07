@@ -4,7 +4,7 @@ import time
 from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
 from opensystem.OpenProtocol import OpenProtocol
 import sqlite3
-from lib.modbus import asyncOpenModbus
+from lib.modbus import TrayModbus
 
 def QuerySQL(SQL):
     conn = sqlite3.connect('./database/openprotocol.db')
@@ -25,7 +25,12 @@ def main():
 
     open = OpenProtocol(HOST, PORT_TOOL[4])
     cmd = cmd_OpenProtocol()
-    # open_modbus = asyncOpenModbus('', 9600, 'rtu')
+    tray_modbus = TrayModbus(
+        method='rtu', 
+        port='/dev/ttyUSB0',
+        timeout=1,
+        baudrate=19200
+    )
     counting_step = 1
     while True:
         checked = 0
@@ -49,6 +54,8 @@ def main():
                     break
 
                 print(res_step[checked][3])
+                regis = tray_modbus.regisRead(res_step[checked][3], 8)
+                print(regis)
 
                 if loop == checked:
                     checked = 0
@@ -70,8 +77,8 @@ def main():
                             checked += 1
                     old_position = res_lastData['Batch_counter']
                     open.SetData(None)
-                time.sleep(0.2)
+                time.sleep(0.01)
             print('end cycle position')
-
+        time.sleep(0.01)
 if __name__ == '__main__':
     main()

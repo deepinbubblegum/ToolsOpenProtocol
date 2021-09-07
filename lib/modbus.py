@@ -1,50 +1,31 @@
-import socket
-import threading
-import time
-from pymodbus.compat import IS_PYTHON3, PYTHON_VERSION
-if IS_PYTHON3 and PYTHON_VERSION >= (3, 4):
-    import logging
-    import asyncio
-    from pymodbus.client.asynchronous.serial import (
-        AsyncModbusSerialClient as ModbusClient)
-    from pymodbus.client.asynchronous import schedulers
-else:
-    import sys
-    sys.stderr("This example needs to be run only on python 3.4 and above")
-    sys.exit(1)
+from pymodbus.client.sync import ModbusSerialClient as ModbusClient
 
-# --------------------------------------------------------------------------- #
-# configure the client logging
-# --------------------------------------------------------------------------- #
-logging.basicConfig()
+import logging
+FORMAT = ('%(asctime)-15s %(threadName)-15s '
+          '%(levelname)-8s %(module)-15s:%(lineno)-8s %(message)s')
+logging.basicConfig(format=FORMAT)
 log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+log.setLevel(logging.WARNING)
 
-UNIT = 0x01
+UNIT = 0x1
 
-class asyncOpenModbus():
-    def __init__(self, port='/tmp/ptyp0', baudrate='9600', method='rtu'):
-        self.port = port
-        self.baudrate = baudrate
-        self.method = method
-
-        self.loop, self.client_init = ModbusClient(
-            schedulers.ASYNC_IO, 
-            port=self.port, 
-            baudrate=self.baudrate,
-            method=self.method
+class TrayModbus():
+    def __init__(self, method='rtu', port='/dev/ptyp0',timeout=1,baudrate=9600):
+        self.client = ModbusClient(
+            method=method, 
+            port=port,
+            timeout=timeout,
+            baudrate=baudrate
         )
-        self.client = self.client_init.protocol
-        self.rq = None
-        self.rr = None
-        thr_recv = Threading.Thread(target=self.recv)
+        self.client.connect()
 
-    async def recv(self):
-        print('Started Thread reading..')
-        while True:
-            self.rr = await self.client.read_holding_registers(1, 8, unit=UNIT)
-            time.sleep(0.1)
+    def regisWrites(self, address, value):
+        rq = self.client.write_registers(address, value, unit=UNIT)
+        return rq
 
-    async def send(self, value):
-        print('Sending data..')
-        self.rq = await client.write_registers(1, value, unit=UNIT)
+    def regisRead(self, address, value):
+        rr = self.client.read_holding_registers(address, value, unit=UNIT)
+        return rr
+
+    def disconnect(self):
+        self.client.close()
