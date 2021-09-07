@@ -4,26 +4,7 @@ import time
 from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
 from opensystem.OpenProtocol import OpenProtocol
 import sqlite3
-
-    #  SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1'
-# def ToolsPools(HOST, PORT):
-#     open = OpenProtocol(HOST, PORT)
-#     cmd = cmd_OpenProtocol()
-#     while True:
-#         try:
-#             # if open.send_msg(cmd.Linking_Group_info_subscribe()) is not True:
-#             #     continue
-#             if open.send_msg(cmd.Application_ID_upload_request()) is not True:
-#                 continue
-#             # if open.send_msg(cmd.Time_upload_request()) is not True:
-#                 # continue
-#             if open.send_msg(cmd.Enable_tool()) is not True:
-#                 continue
-#             if open.send_msg(cmd.Last_tightening_result_data_subscribe()) is not True:
-#                 continue
-#             time.sleep(0.2)
-#         except Exception as err:
-#             print(err)
+from lib.modbus import asyncOpenModbus
 
 def QuerySQL(SQL):
     conn = sqlite3.connect('./database/openprotocol.db')
@@ -44,16 +25,16 @@ def main():
 
     open = OpenProtocol(HOST, PORT_TOOL[4])
     cmd = cmd_OpenProtocol()
-
+    # open_modbus = asyncOpenModbus('', 9600, 'rtu')
     counting_step = 1
     while True:
         checked = 0
+        old_position = None
         SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1'
         res_step = QuerySQL(SQL_txt)
         if open.send_msg(cmd.Disable_tool()) is not True:
             continue
         open.SetData(None)
-        # print('Disable_tool')
 
         if open.send_msg(cmd.Vehicle_Id_Number_upload_subscribe()) is True:
             res_VIN_CODE = open.Get_VIN_Number_CODE()
@@ -62,6 +43,13 @@ def main():
             print(res_VIN_CODE)
             while True:
                 loop = len(res_step)
+                try:
+                    res_step[checked][3]
+                except Exception as e:
+                    break
+
+                print(res_step[checked][3])
+
                 if loop == checked:
                     checked = 0
                     print('exit loop')
@@ -72,10 +60,18 @@ def main():
                 open.send_msg(cmd.Last_tightening_result_data_subscribe())
                 res_lastData = open.GetData()
                 if res_lastData is not None:
+                    # print(res_lastData['Tightening_Status'])
+                    if int(res_lastData['Tightening_Status']):
+                        checked += 1
+                        print('Tightening :OK')
+                    else:
+                        print('Tightening :NOK')
+                        if old_position != res_lastData['Batch_counter']:
+                            checked += 1
+                    old_position = res_lastData['Batch_counter']
                     open.SetData(None)
-                    checked += 1
-                    # print(checked)
-            print('end cmd')
+                time.sleep(0.2)
+            print('end cycle position')
 
 if __name__ == '__main__':
     main()
