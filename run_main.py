@@ -35,7 +35,7 @@ def main():
     while True:
         checked = 0
         old_position = None
-        SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1'
+        SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1 ORDER BY Step_number ASC'
         res_step = QuerySQL(SQL_txt)
         if open.send_msg(cmd.Disable_tool()) is not True:
             continue
@@ -54,7 +54,7 @@ def main():
                     break
 
                 print(res_step[checked][3])
-                regis = tray_modbus.regisRead(res_step[checked][3], 8)
+                regis = tray_modbus.regisRead(res_step[checked][3], )
                 print(regis)
 
                 if loop == checked:
