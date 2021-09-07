@@ -71,22 +71,19 @@ class GeneralWidget(QWidget):
         HLayout2.addWidget(self.combo_Link_ID, 1)
 
         self.table = QTableWidget(self)
-        self.table.setColumnCount(4)
-        self.table.setRowCount(5)
         # Set the table headers
         self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
         self.table.setAlternatingRowColors(True)
+        self.table.setMinimumSize(80, 80)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.table.resizeColumnsToContents()
-        self.table.resizeRowsToContents()
         # table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         # table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         # table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
         # Set the table values
-        for i in range(1):
-            for j in range(4) :
-                self.table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
+        # for i in range(1):
+        #     for j in range(4) :
+        #         self.table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
         
         HLayout3.addWidget(self.table)
 
@@ -159,14 +156,25 @@ class GeneralWidget(QWidget):
         self.editText_addStep.clear()
 
     def getDataStep(self, value):
-        print('getDataStep')
-        SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1'
+        SQL_txt = 'SELECT Step_number, ID_TRAY_ID, Socket_ID_Step FROM Step WHERE ID_Link_step = {} ORDER BY Step_number ASC'.format(value)
         res_step = QuerySQL(SQL_txt)
-        table_i = 0
-        table_j = 0
-        self.table.setColumnCount(5)
-        self.table.setRowCount(1)
+        self.table.setRowCount(len(res_step))
+        self.table.setColumnCount(len(res_step[0])+1)
+        for i, row in zip(range(len(res_step)), res_step):
+            for j, col in zip(range(len(row)), row):
+                self.table.setItem(i, j, QTableWidgetItem(str(col)))
+            self.btn_del = QPushButton('DELETE')
+            self.btn_del.resize(100,32)
+            self.btn_del.clicked.connect(self.handleButtonClicked)
+            self.table.setCellWidget(i, len(res_step[0]), self.btn_del)
+        self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
+        self.table.adjustSize()
+        self.table.resizeColumnsToContents()
 
-        for i, rows in enumerate(res_step):
-            for j, col in enumerate(rows):
-                self.table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
+
+    def handleButtonClicked(self):
+        button = qApp.focusWidget()
+        # or button = self.sender()
+        index = self.table.indexAt(button.pos())
+        if index.isValid():
+            print(index.row(), index.column())
