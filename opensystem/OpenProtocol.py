@@ -35,6 +35,7 @@ class OpenProtocol:
         
         # parameter and flag
         self.online = False
+        self.VIN_Number_CODE = None
 
         self.isLock_at_batch_accepted = False
         self.deque = deque(maxlen=1)
@@ -214,8 +215,17 @@ class OpenProtocol:
         elif recv_mid:
             print(msg)
       
+    def Get_VIN_Number_CODE(self):
+        return self.VIN_Number_CODE
+
+    def Set_VIN_Number_CODE(self, value):
+        self.VIN_Number_CODE = value
+
     def GetData(self):
         return self.Data
+    
+    def SetData(self, value):
+        self.Data = value
       
     def recv_msg(self):
         while self.isClose is not True:
