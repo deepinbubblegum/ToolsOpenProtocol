@@ -7,8 +7,6 @@ logging.basicConfig(format=FORMAT)
 log = logging.getLogger()
 log.setLevel(logging.WARNING)
 
-UNIT = 0x1
-
 class TrayModbus():
     def __init__(self, method='rtu', port='/dev/ptyp0',timeout=1,baudrate=9600):
         self.client = ModbusClient(
@@ -19,12 +17,12 @@ class TrayModbus():
         )
         self.client.connect()
 
-    def regisWrites(self, address, value):
-        rq = self.client.write_registers(address, value, unit=UNIT)
+    def regisWrites(self, address, value, unit):
+        rq = self.client.write_registers(address, value, unit)
         return rq
 
-    def regisRead(self, address, value):
-        rr = self.client.read_holding_registers(address, value, unit=UNIT)
+    def regisRead(self, address, value, unit):
+        rr = self.client.read_holding_registers(address, value, unit)
         return rr
 
     def disconnect(self):

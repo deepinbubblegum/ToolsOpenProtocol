@@ -54,7 +54,7 @@ def main():
                     break
 
                 print(res_step[checked][3])
-                regis = tray_modbus.regisRead(res_step[checked][3], )
+                regis = tray_modbus.regisRead(1, 8, 0x1)
                 print(regis)
 
                 if loop == checked:

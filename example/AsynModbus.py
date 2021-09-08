@@ -1,59 +1,35 @@
-from pymodbus.compat import IS_PYTHON3, PYTHON_VERSION
-if IS_PYTHON3 and PYTHON_VERSION >= (3, 4):
-    import logging
-    import asyncio
-    from pymodbus.client.asynchronous.serial import (
-        AsyncModbusSerialClient as ModbusClient)
-    from pymodbus.client.asynchronous import schedulers
-else:
-    import sys
-    sys.stderr("This example needs to be run only on python 3.4 and above")
-    sys.exit(1)
+#!/usr/bin/env python3
+import minimalmodbus
+import serial
 
-# --------------------------------------------------------------------------- #
-# configure the client logging
-# --------------------------------------------------------------------------- #
-logging.basicConfig()
-log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+class TrayModbus():
+    def __init__(self, port='/dev/ttyUSB0', baudrate=19200, bytesize = 8, parity=serial.PARITY_NONE, stopbits=1, timeout=0.05):
+        self.instrument = minimalmodbus.Instrument('/dev/ttyUSB0', 0x01)  # port name, slave address (in decimal)
+        self.instrument.serial.port                     # this is the serial port name
+        self.instrument.serial.baudrate = 19200         # Baud
+        self.instrument.serial.bytesize = 8
+        self.instrument.serial.parity   = serial.PARITY_NONE
+        self.instrument.serial.stopbits = 1
+        self.instrument.serial.timeout  = 0.05          # seconds
 
-UNIT = 0x01
-async def start_async(client):
-    try:
-        log.debug("Write to a holding register and read back")
-        rq = await client.write_register(1, 10, unit=UNIT)
-        rr = await client.read_holding_registers(1, 1, unit=UNIT)
-        assert(rq.function_code < 0x80)     # test that we are not an error
-        assert(rr.registers[0] == 10)       # test the expected value
+        self.instrument.address                         # this is the slave address number
+        self.instrument.mode = minimalmodbus.MODE_RTU   # rtu or ascii mode
+        self.instrument.clear_buffers_before_each_transaction = True
 
-        log.debug("Write to multiple holding registers and read back")
-        rq = await client.write_registers(1, [10]*8, unit=UNIT)
-        rr = await client.read_holding_registers(1, 8, unit=UNIT)
-        assert(rq.function_code < 0x80)     # test that we are not an error
-        assert(rr.registers == [10]*8)      # test the expected value
+    def write_register(self, value):
+        self.instrument.write_register(7, value, 1)
 
-        log.debug("Read input registers")
-        rr = await client.read_input_registers(1, 8, unit=UNIT)
-        assert(rq.function_code < 0x80)     # test that we are not an error
+    def read_register(self):
+        res_value = self.instrument.read_register(7, 1)  # Registernumber, number of decimals
+        return res_value
 
-        arguments = {
-            'read_address':    1,
-            'read_count':      8,
-            'write_address':   1,
-            'write_registers': [20]*8,
-        }
-        rq = await client.readwrite_registers(unit=UNIT, **arguments)
-        rr = await client.read_holding_registers(1, 8, unit=UNIT)
-        assert(rq.function_code < 0x80)     # test that we are not an error
-        assert(rq.registers == [20]*8)      # test the expected value
-        assert(rr.registers == [20]*8)      # test the expected value
-    except Exception as e:
-        log.exception(e)
-        client.transport.close()
-    await asyncio.sleep(1)
+    def close(self):
+        self.instrument.serial.close()
+
+def main():
+    tray_modbus = TrayModbus()
+    res = tray_modbus.read_register()
+    print(hex(res))
 
 if __name__ == '__main__':
-    loop, client = ModbusClient(schedulers.ASYNC_IO, port='/tmp/ptyp0',
-                                baudrate=9600, method="rtu")
-    loop.run_until_complete(start_async(client.protocol))
-    loop.close()
+    main()
