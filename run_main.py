@@ -56,10 +56,10 @@ def main():
                     res_step[checked][3]
                 except Exception as e:
                     break
-
-                print(res_step[checked][3])
-                tray_modbus.write_register(res_step[checked][3], 0xFFF, 0x1)
-                res = tray_modbus.read_register(res_step[checked][3], 4)
+                
+                # print(res_step[checked][3])
+                # tray_modbus.write_register(res_step[checked][3], 0xFFF, 0x1)
+                # res = tray_modbus.read_register(res_step[checked][3], 4)
 
                 if loop == checked:
                     checked = 0
