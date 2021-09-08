@@ -29,19 +29,3 @@ class TrayModbus():
 
     def close(self):
         self.instrument.serial.close()
-
-
-# # Test Code
-# def main():
-#     trayModbus = TrayModbus()
-#     # trayModbus.write_register(0, 0xff1, 1)
-#     res = trayModbus.read_register(
-#         registeraddress = 0,
-#         numberOfDecimals = 0, 
-#         functioncode = 4, 
-#         signed=False
-#     )
-#     print(res)
-
-# if __name__ == '__main__':
-#     main()
