@@ -1,6 +1,7 @@
 import socket
 import threading
 import time
+import serial
 from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
 from opensystem.OpenProtocol import OpenProtocol
 import sqlite3
@@ -15,7 +16,6 @@ def QuerySQL(SQL):
     conn.close()
     return res_data
 
-
 def main():
     HOST = '10.1.10.22'
     PORT_TOOL = [
@@ -26,10 +26,15 @@ def main():
     open = OpenProtocol(HOST, PORT_TOOL[4])
     cmd = cmd_OpenProtocol()
     tray_modbus = TrayModbus(
-        port='/dev/ttyUSB0',
-        timeout=1,
-        baudrate=19200
+        port='/dev/ttyUSB0', 
+        device=0x01, 
+        baudrate=19200, 
+        bytesize = 8, 
+        parity=serial.PARITY_NONE, 
+        stopbits=1, 
+        timeout=0.05
     )
+
     counting_step = 1
     while True:
         checked = 0
@@ -53,8 +58,8 @@ def main():
                     break
 
                 print(res_step[checked][3])
-                regis = tray_modbus.regisRead(1, 8, 0x1)
-                print(regis)
+                tray_modbus.write_register(res_step[checked][3], 0xFFF, 0x1)
+                res = tray_modbus.read_register(res_step[checked][3], 4)
 
                 if loop == checked:
                     checked = 0
