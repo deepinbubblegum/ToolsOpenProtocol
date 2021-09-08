@@ -16,20 +16,12 @@ class TrayModbus():
         self.instrument.mode = minimalmodbus.MODE_RTU   # rtu or ascii mode
         self.instrument.clear_buffers_before_each_transaction = True
 
-    def write_register(self, value):
-        self.instrument.write_register(7, value, 1)
+    def write_register(self, address, value, mode=1):
+        self.instrument.write_register(address, value, mode)
 
-    def read_register(self):
-        res_value = self.instrument.read_register(7, 1)  # Registernumber, number of decimals
+    def read_register(self, address, mode=1):
+        res_value = self.instrument.read_register(address, mode)  # Registernumber, number of decimals
         return res_value
 
     def close(self):
         self.instrument.serial.close()
-
-def main():
-    tray_modbus = TrayModbus()
-    res = tray_modbus.read_register()
-    print(hex(res))
-
-if __name__ == '__main__':
-    main()
