@@ -26,7 +26,6 @@ def main():
     open = OpenProtocol(HOST, PORT_TOOL[4])
     cmd = cmd_OpenProtocol()
     tray_modbus = TrayModbus(
-        method='rtu', 
         port='/dev/ttyUSB0',
         timeout=1,
         baudrate=19200
