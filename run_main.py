@@ -5,7 +5,7 @@ import serial
 from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
 from opensystem.OpenProtocol import OpenProtocol
 import sqlite3
-from lib.modbus import TrayModbus
+from lib.traySocket import TrayModbus
 
 def QuerySQL(SQL):
     conn = sqlite3.connect('./database/openprotocol.db')
@@ -42,6 +42,7 @@ def main():
         SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1 ORDER BY Step_number ASC'
         res_step = QuerySQL(SQL_txt)
         if open.send_msg(cmd.Disable_tool()) is not True:
+            time.sleep(0.5)
             continue
         open.SetData(None)
 
@@ -57,9 +58,9 @@ def main():
                 except Exception as e:
                     break
                 
-                # print(res_step[checked][3])
-                # tray_modbus.write_register(res_step[checked][3], 0xFFF, 0x1)
-                # res = tray_modbus.read_register(res_step[checked][3], 4)
+                print(res_step[checked][3])
+                tray_modbus.write_register(res_step[checked][3], 0xFFF, 0x1)
+                res = tray_modbus.read_register(res_step[checked][3], 4)
 
                 if loop == checked:
                     checked = 0
