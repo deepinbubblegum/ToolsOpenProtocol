@@ -21,7 +21,6 @@ class socket_tray():
     def thr_socket_tray(self):
         while True:
             res_socket = self.tray_modbus.get_socket_pickup()
-            # print(res_socket)
             if self.NextPosition is True:
                 if self.pick_id is not None and bool(res_socket[self.pick_id - 1]):
                     if self.old_pick_id is not None and bool(res_socket[self.old_pick_id - 1]):
