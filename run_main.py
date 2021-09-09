@@ -59,8 +59,8 @@ def main():
                     break
                 
                 print(res_step[checked][3])
-                tray_modbus.write_register(res_step[checked][3], 0xFFF, 0x1)
-                res = tray_modbus.read_register(res_step[checked][3], 4)
+                tray_modbus.set_socket_pickup(res_step[checked][3])
+                
 
                 if loop == checked:
                     checked = 0
