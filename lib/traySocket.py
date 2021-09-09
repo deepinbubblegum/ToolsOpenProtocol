@@ -81,6 +81,9 @@ class TrayModbus():
     def set_socket_pickup(self, value):
         self.socket_pickup = value
         
+    def get_socket_pickup(self):
+        return self.socket_tray
+        
     def write_register(self, registeraddress, value, mode=0):
         self.instrument.write_register(registeraddress, value, mode)
 
