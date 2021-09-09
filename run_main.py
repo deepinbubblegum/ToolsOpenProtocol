@@ -2,9 +2,10 @@ import socket
 import threading
 import time
 import serial
+import sqlite3
 from system.cmd_OpenProtocol import cmd_OpenProtocol
 from system.OpenProtocol import OpenProtocol
-import sqlite3
+from system.socket_tray import socket_tray
 from lib.traySocket import TrayModbus
 
 def QuerySQL(SQL):
@@ -34,11 +35,7 @@ def main():
         stopbits=1, 
         timeout=0.05
     )
-
-    counting_step = 1
-    old_socket_pickup = None
-    
-    thr_tools_check = 
+    socket_hole = socket_tray(tray_modbus, open)
     
     while True:
         checked = 0
@@ -46,7 +43,7 @@ def main():
         SQL_txt = 'SELECT * FROM Step WHERE ID_Link_step = 1 ORDER BY Step_number ASC'
         res_step = QuerySQL(SQL_txt)
         if open.send_msg(cmd.Disable_tool()) is not True:
-            time.sleep(0.5)
+            time.sleep(0.2)
             continue
         open.SetData(None)
 
@@ -61,48 +58,34 @@ def main():
                     res_step[checked][3]
                 except Exception as e:
                     break
-                
-                # tray_modbus.set_socket_pickup(res_step[checked][3])
-                # if old_socket_pickup is not None:
-                #     res_socket = tray_modbus.get_socket_pickup()                    
-                #     if bool(res_socket[old_socket_pickup]) is True:
-                #         open.send_msg(cmd.Disable_tool())
-                #         time.sleep(0.1)
-                #         continue
-                
-                # # print(res_step[checked][3])
-                # res_socket = tray_modbus.get_socket_pickup()
-                # if bool(res_socket[(res_step[checked][3] - 1)]) is False:
-                #     open.send_msg(cmd.Disable_tool())
-                #     time.sleep(0.1)
-                #     old_socket_pickup = None
-                #     continue
-                # print(res_socket)
-                # old_socket_pickup = (res_step[checked][3] - 1)
-                
+                                
                 if loop == checked:
                     checked = 0
                     print('exit loop')
                     break
 
                 open.Set_VIN_Number_CODE(None)
-                open.send_msg(cmd.Enable_tool())
-                # print('Enable_tool')
+                socket_hole.set_socket_pickup(res_step[checked][3])
                 open.send_msg(cmd.Last_tightening_result_data_subscribe())
                 res_lastData = open.GetData()
                 if res_lastData is not None:
                     # print(res_lastData['Tightening_Status'])
                     if int(res_lastData['Tightening_Status']):
+                        open.send_msg(cmd.Disable_tool())
                         checked += 1
+                        socket_hole.set_NextPosition()
                         print('Tightening :OK')
                     else:
                         print('Tightening :NOK')
                         if old_position != res_lastData['Batch_counter']:
+                            open.send_msg(cmd.Disable_tool())
                             checked += 1
+                            socket_hole.set_NextPosition()
                     old_position = res_lastData['Batch_counter']
                     open.SetData(None)
                 time.sleep(0.01)
             print('end cycle position')
+            socket_hole.set_socket_pickup(None)
         time.sleep(0.01)
 if __name__ == '__main__':
     main()

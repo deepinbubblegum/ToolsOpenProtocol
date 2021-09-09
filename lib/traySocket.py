@@ -48,17 +48,20 @@ class TrayModbus():
     def Thread_Tray_socket(self):
         while True:
             for idx_add in range(len(self.socket_tray)):
-                self.socket_tray[idx_add] = self.read_register(
-                    registeraddress = idx_add,
-                    numberOfDecimals = 0,
-                    functioncode = 4,
-                    signed = False
-                )
-                self.write_register(
-                    registeraddress=idx_add, 
-                    value=self.leds_socket_tray[idx_add],
-                    mode=0
-                )
+                try:
+                    self.socket_tray[idx_add] = self.read_register(
+                        registeraddress = idx_add,
+                        numberOfDecimals = 0,
+                        functioncode = 4,
+                        signed = False
+                    )
+                    self.write_register(
+                        registeraddress=idx_add, 
+                        value=self.leds_socket_tray[idx_add],
+                        mode=0
+                    )
+                except Exception as e:
+                    pass
                 
     def event_socket_tray(self):
         idx_bing_led = 0
