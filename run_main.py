@@ -2,8 +2,8 @@ import socket
 import threading
 import time
 import serial
-from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
-from opensystem.OpenProtocol import OpenProtocol
+from system.cmd_OpenProtocol import cmd_OpenProtocol
+from system.OpenProtocol import OpenProtocol
 import sqlite3
 from lib.traySocket import TrayModbus
 
@@ -36,6 +36,10 @@ def main():
     )
 
     counting_step = 1
+    old_socket_pickup = None
+    
+    thr_tools_check = 
+    
     while True:
         checked = 0
         old_position = None
@@ -58,14 +62,29 @@ def main():
                 except Exception as e:
                     break
                 
-                print(res_step[checked][3])
-                tray_modbus.set_socket_pickup(res_step[checked][3])
+                # tray_modbus.set_socket_pickup(res_step[checked][3])
+                # if old_socket_pickup is not None:
+                #     res_socket = tray_modbus.get_socket_pickup()                    
+                #     if bool(res_socket[old_socket_pickup]) is True:
+                #         open.send_msg(cmd.Disable_tool())
+                #         time.sleep(0.1)
+                #         continue
                 
-
+                # # print(res_step[checked][3])
+                # res_socket = tray_modbus.get_socket_pickup()
+                # if bool(res_socket[(res_step[checked][3] - 1)]) is False:
+                #     open.send_msg(cmd.Disable_tool())
+                #     time.sleep(0.1)
+                #     old_socket_pickup = None
+                #     continue
+                # print(res_socket)
+                # old_socket_pickup = (res_step[checked][3] - 1)
+                
                 if loop == checked:
                     checked = 0
                     print('exit loop')
                     break
+
                 open.Set_VIN_Number_CODE(None)
                 open.send_msg(cmd.Enable_tool())
                 # print('Enable_tool')

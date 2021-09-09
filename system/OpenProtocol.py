@@ -3,8 +3,8 @@ import threading
 import time
 from datetime import datetime
 from collections import deque 
-from opensystem.cmd_OpenProtocol import cmd_OpenProtocol
-from opensystem.data_info import Data_info
+from system.cmd_OpenProtocol import cmd_OpenProtocol
+from system.data_info import Data_info
 
 class OpenProtocol:
     def __init__(self, host, port):
