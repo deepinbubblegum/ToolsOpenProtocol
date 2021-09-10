@@ -79,8 +79,8 @@ class GeneralWidget(QWidget):
         self.table = QTableWidget(self)
         self.table.setItemDelegate(delegate)
 
-        self.table.setAcceptDrops(True)
-        self.table.setDragEnabled(True)
+        # self.table.setAcceptDrops(True)
+        # self.table.setDragEnabled(True)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection) 
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         
