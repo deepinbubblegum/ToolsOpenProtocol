@@ -32,6 +32,7 @@ class OpenProtocol:
         
         self.Data = {}
         # self.Data_old = {}
+        self.link_group_select = None
         
         # parameter and flag
         self.online = False
@@ -201,9 +202,25 @@ class OpenProtocol:
             # print(self.Data)
             
         elif recv_mid == '0035':
+            # 006300350010        0101020031040005050000062021-09-10:13:59:32
             self.Rev_num_msg = msg[8:11]
             self.No_ack_flag = msg[11:12]
             print(msg)
+            Linking_Group_ID = msg[22:24]
+            Linking_Group_status = msg[26:27]
+            Linking_Group_batch_mode = msg[29:30]
+            Linking_Group_batch_size = msg[32:36]
+            Linking_Group_batch_counter = msg[38:42]
+            Time_stamp = datetime.strptime(msg[44:63], '%Y-%m-%d:%H:%M:%S')
+            self.link_group_select = {
+                'Linking_Group_ID' : Linking_Group_ID,
+                'Linking_Group_status' : Linking_Group_status,
+                'Linking_Group_batch_mode' : Linking_Group_batch_mode,
+                'Linking_Group_batch_size' : Linking_Group_batch_size,
+                'Linking_Group_batch_counter' : Linking_Group_batch_counter,
+                'Time_stamp' : Time_stamp
+            }
+            print(self.link_group_select)
             self.res_Linking_Group_info_acknowledge()
         
         elif recv_mid == '0011':

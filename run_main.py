@@ -47,6 +47,12 @@ def main():
             continue
         open.SetData(None)
 
+        while True:
+            open.send_msg(cmd.Linking_Group_info_subscribe())
+            time.sleep(1)
+            open.send_msg(cmd.Linking_Group_info_acknowledge())
+            time.sleep(2)
+
         if open.send_msg(cmd.Vehicle_Id_Number_upload_subscribe()) is True:
             res_VIN_CODE = open.Get_VIN_Number_CODE()
             if res_VIN_CODE is None:

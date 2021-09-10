@@ -54,9 +54,45 @@ class cmd_OpenProtocol:
         strAns += (strHeader + '\0')
         return strAns
 
+    # 0030:Linking Group numbers upload request
+    def Linking_Group_numbers_upload_request(self):
+        strHeader = '0030001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
+    
+    # 0031 Linking Group numbers upload reply
+    def Linking_Group_numbers_upload_reply(self):
+        strHeader = '0031001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
+    
+    # 0032:Linking Group data upload request
+    def Linking_Group_data_upload_request(self):
+        strHeader = '0032001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
+
     # 0034:Linking Group info subscribe
     def Linking_Group_info_subscribe(self):
         strHeader = '0034001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
+    
+    # 0035:Linking Group/Selected info
+    def Linking_Group_Selected_info(self):
+        strHeader = '0035001000000000'
         strData = ''
         strAns = "00000000" + str(len(strHeader) + 4)
         strAns = strAns[-4:len(strAns)]
@@ -66,6 +102,15 @@ class cmd_OpenProtocol:
     # 0036:Linking Group info acknowledge
     def Linking_Group_info_acknowledge(self):
         strHeader = '0036001000000000'
+        strData = ''
+        strAns = "00000000" + str(len(strHeader) + 4)
+        strAns = strAns[-4:len(strAns)]
+        strAns += (strHeader + '\0')
+        return strAns
+    
+    # 0037:Linking Group info acknowledge
+    def Linking_Group_Info_Selected_unsubscribe(self):
+        strHeader = '0037001000000000'
         strData = ''
         strAns = "00000000" + str(len(strHeader) + 4)
         strAns = strAns[-4:len(strAns)]
