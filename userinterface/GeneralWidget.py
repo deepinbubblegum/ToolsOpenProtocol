@@ -78,19 +78,11 @@ class GeneralWidget(QWidget):
         delegate = ForSizeOnlyDelegate()
         self.table = QTableWidget(self)
         self.table.setItemDelegate(delegate)
-        # Set the table headers
-        # self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
-        # self.table.setAlternatingRowColors(True)
-        # self.table.setMinimumSize(80, 80)
-        # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        # table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        # table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        # table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
 
-        # Set the table values
-        # for i in range(1):
-        #     for j in range(4) :
-        #         self.table.setItem(i, j, QTableWidgetItem("STEP-" + str(i+1) + " , Col-" + str(j+1)))
+        self.table.setAcceptDrops(True)
+        self.table.setDragEnabled(True)
+        self.table.setSelectionMode(QAbstractItemView.SingleSelection) 
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         
         HLayout3.addWidget(self.table)
 
@@ -180,6 +172,7 @@ class GeneralWidget(QWidget):
         # self.table.setMaximumSize(38, 38)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.adjustSize()
+        self.table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.table.resizeColumnsToContents()
         self.table.resizeRowsToContents()
 
