@@ -65,7 +65,9 @@ def main():
                     break
 
                 open.Set_VIN_Number_CODE(None)
+                
                 socket_hole.set_socket_pickup(res_step[checked][3])
+                
                 open.send_msg(cmd.Last_tightening_result_data_subscribe())
                 res_lastData = open.GetData()
                 if res_lastData is not None:

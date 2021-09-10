@@ -11,7 +11,6 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         # this will hide the title bar
-
         self.setWindowFlag(Qt.FramelessWindowHint)
         
         self.setWindowTitle("GUI Manager")

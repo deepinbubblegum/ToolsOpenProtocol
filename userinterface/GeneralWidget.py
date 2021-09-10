@@ -18,6 +18,11 @@ def QuerySQL(SQL):
     conn.close()
     return res_data
 
+class ForSizeOnlyDelegate(QItemDelegate):
+    def sizeHint(self, option, index):
+        # print("sizeHint", index.row(), index.column())
+        return QSize(38, 38)
+
 class GeneralWidget(QWidget):
     def __init__(self, parent=None):
         super(GeneralWidget, self).__init__(parent)
@@ -69,13 +74,15 @@ class GeneralWidget(QWidget):
 
         HLayout2.addWidget(label_Link_ID)
         HLayout2.addWidget(self.combo_Link_ID, 1)
-
+        
+        delegate = ForSizeOnlyDelegate()
         self.table = QTableWidget(self)
+        self.table.setItemDelegate(delegate)
         # Set the table headers
-        self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
-        self.table.setAlternatingRowColors(True)
-        self.table.setMinimumSize(80, 80)
-        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        # self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
+        # self.table.setAlternatingRowColors(True)
+        # self.table.setMinimumSize(80, 80)
+        # self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         # table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         # table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
@@ -156,7 +163,7 @@ class GeneralWidget(QWidget):
         self.editText_addStep.clear()
 
     def getDataStep(self, value):
-        SQL_txt = 'SELECT Step_number, ID_TRAY_ID, Socket_ID_Step FROM Step WHERE ID_Link_step = {} ORDER BY Step_number ASC'.format(value)
+        SQL_txt = 'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE ID_Link_step = {} ORDER BY Step_number ASC'.format(value)
         res_step = QuerySQL(SQL_txt)
         self.table.setRowCount(len(res_step))
         self.table.setColumnCount(len(res_step[0])+1)
@@ -164,12 +171,17 @@ class GeneralWidget(QWidget):
             for j, col in zip(range(len(row)), row):
                 self.table.setItem(i, j, QTableWidgetItem(str(col)))
             self.btn_del = QPushButton('DELETE')
-            self.btn_del.resize(100,32)
+            # self.btn_del.resize(100,32)
             self.btn_del.clicked.connect(self.handleButtonClicked)
             self.table.setCellWidget(i, len(res_step[0]), self.btn_del)
-        self.table.setHorizontalHeaderLabels(["STEP Number", "TRAY ID", "SOCKET ID", "COMMAND"])
+        self.table.setHorizontalHeaderLabels(["TRAY ID", "SOCKET ID", "COMMAND"])
+        self.table.setAlternatingRowColors(True)
+        self.table.setMinimumSize(600, 280)
+        # self.table.setMaximumSize(38, 38)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.adjustSize()
         self.table.resizeColumnsToContents()
+        self.table.resizeRowsToContents()
 
 
     def handleButtonClicked(self):
