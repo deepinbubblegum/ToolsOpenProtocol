@@ -55,11 +55,11 @@ class GeneralWidget(QWidget):
         validator = QRegExpValidator(regex)
 
         label_IPAddress = QLabel("IP Address :")
-        editText_IPAddress = QLineEdit(self)
-        editText_IPAddress.setPlaceholderText("255.255.255.255")
-        editText_IPAddress.setValidator(validator)
+        self.editText_IPAddress = QLineEdit(self)
+        self.editText_IPAddress.setPlaceholderText("255.255.255.255")
+        self.editText_IPAddress.setValidator(validator)
         HLayout1.addWidget(label_IPAddress)
-        HLayout1.addWidget(editText_IPAddress)
+        HLayout1.addWidget(self.editText_IPAddress)
 
         label_Tools = QLabel("Tools :")
         self.combo_Tools = QComboBox(self)
@@ -125,10 +125,12 @@ class GeneralWidget(QWidget):
         self.Link_QuerySQL()
         self.GetDataSocket(1)
         self.GetDataTRAY()
+        
+        self.getIpAddress()
 
     def GetDataSocket(self, value):
         self.combo_addSocket.clear()
-        SQL_txt = 'SELECT * FROM Socket WHERE Socket_Tray_ID = ' + str(value)
+        SQL_txt = 'SELECT * FROM Socket'
         res_socket = QuerySQL(SQL_txt)
         for row in res_socket:
             self.combo_addSocket.addItem(str(row[1]))
@@ -145,8 +147,7 @@ class GeneralWidget(QWidget):
 
     def on_combo_Link_changed(self, value):
         value = value + 1
-        # print(value)
-        self.getDataStep(value)
+        self.getDataStep(5, 1)
 
     def Link_QuerySQL(self):
         self.combo_Link_ID.clear()
@@ -160,9 +161,16 @@ class GeneralWidget(QWidget):
         stepTRAY = str(self.combo_addTRAY.currentText())
         stepSocket = str(self.combo_addSocket.currentText())
 
-    def getDataStep(self, value):
-        SQL_txt = 'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE ID_Link_step = {} ORDER BY Step_number ASC'.format(value)
+    def getIpAddress(self):
+        SQL_txt = "SELECT IP_Address FROM IP"
         res_step = QuerySQL(SQL_txt)
+        # print(res_step[0][0])
+        self.editText_IPAddress.setText(res_step[0][0])
+
+    def getDataStep(self, Tools_ID, Id_Link):
+        SQL_txt = "SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC".format(Tools_ID, Id_Link)
+        res_step = QuerySQL(SQL_txt)
+        print(res_step)
         if len(res_step) > 0:
             self.table.setRowCount(len(res_step))
             self.table.setColumnCount(len(res_step[0])+1)
