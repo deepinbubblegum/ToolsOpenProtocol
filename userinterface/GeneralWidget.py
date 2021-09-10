@@ -161,10 +161,8 @@ class GeneralWidget(QWidget):
         stepSocket = str(self.combo_addSocket.currentText())
 
     def getDataStep(self, value):
-        SQL_txt = 'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE ID_Link_step = {} ORDER BY Step_number ASC'.format(
-            value)
+        SQL_txt = 'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE ID_Link_step = {} ORDER BY Step_number ASC'.format(value)
         res_step = QuerySQL(SQL_txt)
-        print(len(res_step))
         if len(res_step) > 0:
             self.table.setRowCount(len(res_step))
             self.table.setColumnCount(len(res_step[0])+1)
@@ -172,7 +170,6 @@ class GeneralWidget(QWidget):
                 for j, col in zip(range(len(row)), row):
                     self.table.setItem(i, j, QTableWidgetItem(str(col)))
                 self.btn_del = QPushButton('DELETE')
-                # self.btn_del.resize(100,32)
                 self.btn_del.clicked.connect(self.handleButtonClicked)
                 self.table.setCellWidget(i, len(res_step[0]), self.btn_del)
         else:
