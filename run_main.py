@@ -27,7 +27,7 @@ def main():
         9005, 9006, 9007, 9008
     ]
 
-    open = OpenProtocol(HOST, PORT_TOOL[4])
+    open = OpenProtocol(HOST, PORT_TOOL[3])
     cmd = cmd_OpenProtocol()
     tray_modbus = TrayModbusV2(
         port='/dev/ttyUSB0', 
@@ -57,9 +57,9 @@ def main():
         # 'Time_stamp': datetime.datetime(2021, 9, 11, 18, 23, 46)
         # }
         
-        socket_hole.set_init_Socket(2, 0x00F)
+        # socket_hole.set_init_Socket(2, 0x00F)
         open.send_msg(cmd.Linking_Group_info_subscribe())
-        init_socket_led()
+        # init_socket_led()
 
         if open.send_msg(cmd.Vehicle_Id_Number_upload_subscribe()) is True:
             res_VIN_CODE = open.Get_VIN_Number_CODE()
