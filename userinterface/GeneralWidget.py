@@ -216,14 +216,14 @@ class GeneralWidget(QWidget):
             )
             if len(res_step) > 0:
                 self.table.setRowCount(len(res_step))
-                self.table.setColumnCount(len(res_step[0])+1)
+                self.table.setColumnCount(len(res_step[0])-1)
                 for i, row in zip(range(len(res_step)), res_step):
                     for j, col in zip(range(len(row)), row):
                         if j >= 2:
                             self.table.setItem(i, j-2, QTableWidgetItem(str(col)))
                     self.btn_del = QPushButton('DELETE')
                     self.btn_del.clicked.connect(self.handleButtonClicked)
-                    self.table.setCellWidget(i, len(res_step[0]), self.btn_del)
+                    self.table.setCellWidget(i, len(res_step[0])-2, self.btn_del)
             else:
                 while (self.table.rowCount() > 0):
                     self.table.removeRow(0)
