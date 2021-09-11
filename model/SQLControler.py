@@ -31,3 +31,37 @@ class sqlControler():
         res_data = cur.fetchall()
         self.conn.close()
         return res_data
+    
+    def db_del_step(self, ID_STEP, ID_Link_step):
+        self.conn = self.create_connection()
+        sql = '''
+            DELETE FROM Step
+            WHERE ID_STEP = (?)
+            AND ID_Link_step = (?)
+            '''
+        cur = self.conn.cursor()
+        cur.execute(sql, (ID_STEP, ID_Link_step,))
+        self.conn.commit()
+        self.conn.close()
+        
+    def db_add_step(self, stepTRAY, stepSocket, stepTools, stepLink_ID):
+        self.conn = self.create_connection()
+        sql = '''
+            INSERT INTO Step (ID_STEP, ID_Link_step, Step_number, Socket_ID_Step, ID_TRAY_ID, Step_Tools_ID) 
+            VALUES((
+                    SELECT IFNULL(MAX(ID_STEP), 0) + 1
+                    FROM Step
+                    ORDER BY ID_STEP
+                ), (?),
+                (
+                    SELECT IFNULL(MAX(Step_number), 0) + 1
+                    FROM Step 
+                    WHERE ID_Link_step = (?)
+                    ORDER BY Step_number
+                ), 
+            (?), (?), (?))
+        '''
+        cur = self.conn.cursor()
+        cur.execute(sql, (stepLink_ID, stepLink_ID, stepSocket, stepTRAY, stepTools))
+        self.conn.commit()
+        self.conn.close()
