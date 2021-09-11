@@ -12,7 +12,7 @@ class sqlControler():
             print(e)
         return conn
     
-    def update_ip(self, ipAddress):
+    def db_Update_ip(self, ipAddress):
         self.conn = self.create_connection()
         sql = '''
             UPDATE IP 
@@ -24,7 +24,7 @@ class sqlControler():
         self.conn.commit()
         self.conn.close()
         
-    def QuerySQL(self, SQL):
+    def db_QuerySQL(self, SQL):
         self.conn = self.create_connection()
         cur = self.conn.cursor()
         cur.execute(SQL)

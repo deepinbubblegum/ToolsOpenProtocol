@@ -30,7 +30,7 @@ class GeneralWidget(QWidget):
         super(GeneralWidget, self).__init__(parent)
         
         self._sqlControler = sqlControler('./database/openprotocol.db')
-        res_tools = self._sqlControler.QuerySQL(
+        res_tools = self._sqlControler.db_QuerySQL(
             'SELECT * FROM Tools'
         )
 
@@ -139,19 +139,19 @@ class GeneralWidget(QWidget):
         
     def on_click_Ip_save(self):
         ipAddress = str(self.editText_IPAddress.text())
-        self._sqlControler.update_ip(ipAddress)
+        self._sqlControler.db_Update_ip(ipAddress)
         self.getIpAddress()
         print('Save Change Ip Address.')
         
     def getIpAddress(self):
-        res_step = self._sqlControler.QuerySQL(
+        res_step = self._sqlControler.db_QuerySQL(
             'SELECT IP_Address FROM IP'
         )
         self.editText_IPAddress.setText(res_step[0][0])
 
     def GetDataSocket(self):
         self.combo_addSocket.clear()
-        res_socket = self._sqlControler.QuerySQL(
+        res_socket = self._sqlControler.db_QuerySQL(
             'SELECT * FROM Socket'
         )
         for row in res_socket:
@@ -159,7 +159,7 @@ class GeneralWidget(QWidget):
 
     def GetDataTRAY(self):
         self.combo_addTRAY.clear()
-        res_tray = self._sqlControler.QuerySQL(
+        res_tray = self._sqlControler.db_QuerySQL(
             'SELECT * FROM TRAY'
         )
         for row in res_tray:
@@ -174,7 +174,7 @@ class GeneralWidget(QWidget):
 
     def Link_QuerySQL(self):
         self.combo_Link_ID.clear()
-        res_link = self._sqlControler.QuerySQL(
+        res_link = self._sqlControler.db_QuerySQL(
             'SELECT * FROM Link'
         )
         for row in res_link:
@@ -186,7 +186,7 @@ class GeneralWidget(QWidget):
         stepSocket = str(self.combo_addSocket.currentText())
 
     def getDataStep(self, Tools_ID, Id_Link):
-        res_step = self._sqlControler.QuerySQL(
+        res_step = self._sqlControler.db_QuerySQL(
             'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC'.format(Tools_ID, Id_Link)
         )
         print(res_step)
