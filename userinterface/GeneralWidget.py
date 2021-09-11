@@ -6,19 +6,18 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from subprocess import call
 from qtwidgets import Toggle, AnimatedToggle
+from model.SQLControler import sqlControler
 
-import sqlite3
+# import sqlite3
 
-
-def QuerySQL(SQL):
-    conn = sqlite3.connect('./database/openprotocol.db')
-    cur = conn.cursor()
-    cur.execute(SQL)
-    res_data = cur.fetchall()
-    conn.commit()
-    conn.close()
-    return res_data
-
+# def QuerySQL(SQL):
+#     conn = sqlite3.connect('./database/openprotocol.db')
+#     cur = conn.cursor()
+#     cur.execute(SQL)
+#     res_data = cur.fetchall()
+#     conn.commit()
+#     conn.close()
+#     return res_data
 
 class ForSizeOnlyDelegate(QItemDelegate):
     def sizeHint(self, option, index):
@@ -29,9 +28,11 @@ class ForSizeOnlyDelegate(QItemDelegate):
 class GeneralWidget(QWidget):
     def __init__(self, parent=None):
         super(GeneralWidget, self).__init__(parent)
-
-        SQL_txt = 'SELECT * FROM Tools'
-        res_tools = QuerySQL(SQL_txt)
+        
+        self._sqlControler = sqlControler('./database/openprotocol.db')
+        res_tools = self._sqlControler.QuerySQL(
+            'SELECT * FROM Tools'
+        )
 
         VLayout = QVBoxLayout(self)
         HLayout1 = QHBoxLayout()
@@ -58,8 +59,14 @@ class GeneralWidget(QWidget):
         self.editText_IPAddress = QLineEdit(self)
         self.editText_IPAddress.setPlaceholderText("255.255.255.255")
         self.editText_IPAddress.setValidator(validator)
+        
+        self.ip_address_Button = QPushButton("Save Change")
+        self.ip_address_Button.clicked.connect(self.on_click_Ip_save)
+        
         HLayout1.addWidget(label_IPAddress)
         HLayout1.addWidget(self.editText_IPAddress)
+        HLayout1.addWidget(self.ip_address_Button)
+        
 
         label_Tools = QLabel("Tools :")
         self.combo_Tools = QComboBox(self)
@@ -120,25 +127,41 @@ class GeneralWidget(QWidget):
         HLayout4.addWidget(self.combo_addSocket, 1)
 
         HLayout4.addWidget(addButton, 2)
+        
+        self.Link_ID_value = None
 
         # init sql
         self.Link_QuerySQL()
-        self.GetDataSocket(1)
+        self.GetDataSocket()
         self.GetDataTRAY()
         
         self.getIpAddress()
+        
+    def on_click_Ip_save(self):
+        ipAddress = str(self.editText_IPAddress.text())
+        self._sqlControler.update_ip(ipAddress)
+        self.getIpAddress()
+        print('Save Change Ip Address.')
+        
+    def getIpAddress(self):
+        res_step = self._sqlControler.QuerySQL(
+            'SELECT IP_Address FROM IP'
+        )
+        self.editText_IPAddress.setText(res_step[0][0])
 
-    def GetDataSocket(self, value):
+    def GetDataSocket(self):
         self.combo_addSocket.clear()
-        SQL_txt = 'SELECT * FROM Socket'
-        res_socket = QuerySQL(SQL_txt)
+        res_socket = self._sqlControler.QuerySQL(
+            'SELECT * FROM Socket'
+        )
         for row in res_socket:
             self.combo_addSocket.addItem(str(row[1]))
 
     def GetDataTRAY(self):
         self.combo_addTRAY.clear()
-        SQL_txt = 'SELECT * FROM TRAY'
-        res_tray = QuerySQL(SQL_txt)
+        res_tray = self._sqlControler.QuerySQL(
+            'SELECT * FROM TRAY'
+        )
         for row in res_tray:
             self.combo_addTRAY.addItem(str(row[1]))
 
@@ -151,8 +174,9 @@ class GeneralWidget(QWidget):
 
     def Link_QuerySQL(self):
         self.combo_Link_ID.clear()
-        SQL_txt = 'SELECT * FROM Link'
-        res_link = QuerySQL(SQL_txt)
+        res_link = self._sqlControler.QuerySQL(
+            'SELECT * FROM Link'
+        )
         for row in res_link:
             self.combo_Link_ID.addItem(str(row[1]))
 
@@ -161,15 +185,10 @@ class GeneralWidget(QWidget):
         stepTRAY = str(self.combo_addTRAY.currentText())
         stepSocket = str(self.combo_addSocket.currentText())
 
-    def getIpAddress(self):
-        SQL_txt = "SELECT IP_Address FROM IP"
-        res_step = QuerySQL(SQL_txt)
-        # print(res_step[0][0])
-        self.editText_IPAddress.setText(res_step[0][0])
-
     def getDataStep(self, Tools_ID, Id_Link):
-        SQL_txt = "SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC".format(Tools_ID, Id_Link)
-        res_step = QuerySQL(SQL_txt)
+        res_step = self._sqlControler.QuerySQL(
+            'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC'.format(Tools_ID, Id_Link)
+        )
         print(res_step)
         if len(res_step) > 0:
             self.table.setRowCount(len(res_step))
@@ -188,14 +207,12 @@ class GeneralWidget(QWidget):
             ["TRAY ID", "SOCKET ID", "COMMAND"])
         self.table.setAlternatingRowColors(True)
         self.table.setMinimumSize(600, 280)
-        # self.table.setMaximumSize(600, 280)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.resizeRowsToContents()
-        # self.table.adjustSize()
 
     def handleButtonClicked(self):
         button = qApp.focusWidget()
         # or button = self.sender()
         index = self.table.indexAt(button.pos())
         if index.isValid():
-            print(index.row(), index.column())
+            print(index.row()+1, index.column()+1)
