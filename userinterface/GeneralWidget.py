@@ -128,7 +128,8 @@ class GeneralWidget(QWidget):
 
         HLayout4.addWidget(addButton, 2)
         
-        self.Link_ID_value = None
+        self.Select_Link_ID_Value = None
+        self.Select_Tools_Value = None
 
         # init sql
         self.Link_QuerySQL()
@@ -165,12 +166,15 @@ class GeneralWidget(QWidget):
         for row in res_tray:
             self.combo_addTRAY.addItem(str(row[1]))
 
-    def on_combo_Tools_changed(self):
+    def on_combo_Tools_changed(self, value):
+        # print('Tools', value)
+        self.Select_Tools_Value = value + 1
         self.Link_QuerySQL()
 
     def on_combo_Link_changed(self, value):
-        value = value + 1
-        self.getDataStep(5, 1)
+        self.Select_Link_ID_Value = value + 1
+        # print('Link :',value)
+        self.getDataStep()
 
     def Link_QuerySQL(self):
         self.combo_Link_ID.clear()
@@ -184,25 +188,30 @@ class GeneralWidget(QWidget):
     def on_click_addStep(self):
         stepTRAY = str(self.combo_addTRAY.currentText())
         stepSocket = str(self.combo_addSocket.currentText())
+        print('add step')
 
-    def getDataStep(self, Tools_ID, Id_Link):
-        res_step = self._sqlControler.db_QuerySQL(
-            'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC'.format(Tools_ID, Id_Link)
-        )
-        print(res_step)
-        if len(res_step) > 0:
-            self.table.setRowCount(len(res_step))
-            self.table.setColumnCount(len(res_step[0])+1)
-            for i, row in zip(range(len(res_step)), res_step):
-                for j, col in zip(range(len(row)), row):
-                    self.table.setItem(i, j, QTableWidgetItem(str(col)))
-                self.btn_del = QPushButton('DELETE')
-                self.btn_del.clicked.connect(self.handleButtonClicked)
-                self.table.setCellWidget(i, len(res_step[0]), self.btn_del)
+    def getDataStep(self):
+        if self.Select_Link_ID_Value is not None and self.Select_Tools_Value is not None:
+            res_step = self._sqlControler.db_QuerySQL(
+                'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC'.format(self.Select_Tools_Value, self.Select_Link_ID_Value)
+            )
+            # print(res_step)
+            if len(res_step) > 0:
+                self.table.setRowCount(len(res_step))
+                self.table.setColumnCount(len(res_step[0])+1)
+                for i, row in zip(range(len(res_step)), res_step):
+                    for j, col in zip(range(len(row)), row):
+                        self.table.setItem(i, j, QTableWidgetItem(str(col)))
+                    self.btn_del = QPushButton('DELETE')
+                    self.btn_del.clicked.connect(self.handleButtonClicked)
+                    self.table.setCellWidget(i, len(res_step[0]), self.btn_del)
+            else:
+                while (self.table.rowCount() > 0):
+                    self.table.removeRow(0)
         else:
             while (self.table.rowCount() > 0):
                 self.table.removeRow(0)
-
+                
         self.table.setHorizontalHeaderLabels(
             ["TRAY ID", "SOCKET ID", "COMMAND"])
         self.table.setAlternatingRowColors(True)
