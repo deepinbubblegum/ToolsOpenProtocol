@@ -8,17 +8,6 @@ from subprocess import call
 from qtwidgets import Toggle, AnimatedToggle
 from model.SQLControler import sqlControler
 
-# import sqlite3
-
-# def QuerySQL(SQL):
-#     conn = sqlite3.connect('./database/openprotocol.db')
-#     cur = conn.cursor()
-#     cur.execute(SQL)
-#     res_data = cur.fetchall()
-#     conn.commit()
-#     conn.close()
-#     return res_data
-
 class ForSizeOnlyDelegate(QItemDelegate):
     def sizeHint(self, option, index):
         # print("sizeHint", index.row(), index.column())
@@ -242,6 +231,7 @@ class GeneralWidget(QWidget):
         self.table.setMinimumSize(600, 280)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.resizeRowsToContents()
+        self.table.scrollToBottom()
 
     def handleButtonClicked(self):
         button = qApp.focusWidget()
