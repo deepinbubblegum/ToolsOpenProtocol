@@ -139,10 +139,29 @@ class GeneralWidget(QWidget):
         self.getIpAddress()
         
     def on_click_Ip_save(self):
-        ipAddress = str(self.editText_IPAddress.text())
-        self._sqlControler.db_Update_ip(ipAddress)
-        self.getIpAddress()
-        print('Save Change Ip Address.')
+        msgBox = QMessageBox()
+        msgBox.setWindowFlags(
+           Qt.Window |
+           Qt.CustomizeWindowHint |
+           Qt.WindowTitleHint |
+           Qt.WindowCloseButtonHint |
+           Qt.WindowStaysOnTopHint
+        )
+        reply = msgBox.question(
+            self, 
+            'Save IP Address', 
+            'Are you sure you want to save change ip adress?', 
+            QMessageBox.Yes | 
+            QMessageBox.No, 
+            QMessageBox.No,
+        )
+        if reply == QMessageBox.Yes:
+            ipAddress = str(self.editText_IPAddress.text())
+            self._sqlControler.db_Update_ip(ipAddress)
+            self.getIpAddress()
+            print('Save Change Ip Address.')
+        else:
+            pass
         
     def getIpAddress(self):
         res_step = self._sqlControler.db_QuerySQL(
@@ -193,15 +212,15 @@ class GeneralWidget(QWidget):
     def getDataStep(self):
         if self.Select_Link_ID_Value is not None and self.Select_Tools_Value is not None:
             res_step = self._sqlControler.db_QuerySQL(
-                'SELECT ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC'.format(self.Select_Tools_Value, self.Select_Link_ID_Value)
+                'SELECT ID_STEP, ID_Link_step, ID_TRAY_ID, Socket_ID_Step FROM Step WHERE Step_Tools_ID = {} AND ID_Link_step = {} ORDER BY Step_number ASC'.format(self.Select_Tools_Value, self.Select_Link_ID_Value)
             )
-            # print(res_step)
             if len(res_step) > 0:
                 self.table.setRowCount(len(res_step))
                 self.table.setColumnCount(len(res_step[0])+1)
                 for i, row in zip(range(len(res_step)), res_step):
                     for j, col in zip(range(len(row)), row):
-                        self.table.setItem(i, j, QTableWidgetItem(str(col)))
+                        if j >= 2:
+                            self.table.setItem(i, j-2, QTableWidgetItem(str(col)))
                     self.btn_del = QPushButton('DELETE')
                     self.btn_del.clicked.connect(self.handleButtonClicked)
                     self.table.setCellWidget(i, len(res_step[0]), self.btn_del)
