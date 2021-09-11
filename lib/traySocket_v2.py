@@ -4,7 +4,7 @@ import serial
 import time
 import threading
 
-class TrayModbus():
+class TrayModbusV2():
     def __init__(self, port='/dev/ttyUSB0', device=0x01, baudrate=19200, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=1):
         self.instrument = minimalmodbus.Instrument(
             port, device)  # port name, slave address (in decimal)
@@ -41,9 +41,9 @@ class TrayModbus():
         self.thread_tray_socket.daemon = True
         self.thread_tray_socket.start()
         
-        self.thread_event_socket = threading.Thread(target=self.event_socket_tray)
-        self.thread_event_socket.daemon = True
-        self.thread_event_socket.start()
+        # self.thread_event_socket = threading.Thread(target=self.event_socket_tray)
+        # self.thread_event_socket.daemon = True
+        # self.thread_event_socket.start()
 
     def Thread_Tray_socket(self):
         while True:

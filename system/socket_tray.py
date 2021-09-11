@@ -14,9 +14,9 @@ class socket_tray():
         self.pick_id = None
         self.old_pick_id = None
         
-        self.thr_tray = threading.Thread(target=self.thr_socket_tray)
-        self.thr_tray.daemon = True
-        self.thr_tray.start()
+        # self.thr_tray = threading.Thread(target=self.thr_socket_tray)
+        # self.thr_tray.daemon = True
+        # self.thr_tray.start()
 
     def thr_socket_tray(self):
         while True:
@@ -39,3 +39,6 @@ class socket_tray():
     def set_NextPosition(self):
         self.NextPosition = True
         self.old_pick_id = self.pick_id
+        
+    def set_init_Socket(self, index=0, color=0x000):
+        self.tray_modbus.leds_socket_tray[index] = color

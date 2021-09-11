@@ -35,7 +35,6 @@ class Window(QMainWindow):
         self.tabs_widget = TabsWidget(self)
         self.setCentralWidget(self.tabs_widget)
 
-
 def handleVisibleChanged():
     if not QGuiApplication.inputMethod().isVisible():
         return
@@ -49,25 +48,25 @@ def handleVisibleChanged():
                 return
 
 def main():
-    # try:
-    # create the application and the main window
-    app = QApplication(sys.argv)
-    QGuiApplication.inputMethod().visibleChanged.connect(handleVisibleChanged)
-    window = Window()
+    try:
+        # create the application and the main window
+        app = QApplication(sys.argv)
+        QGuiApplication.inputMethod().visibleChanged.connect(handleVisibleChanged)
+        window = Window()
 
-    extra = {
-        'danger': '#dc3545',
-        'warning': '#ffc107',
-        'success': '#17a2b8',
-    }
+        extra = {
+            'danger': '#dc3545',
+            'warning': '#ffc107',
+            'success': '#17a2b8',
+        }
 
-    apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True, extra=extra)
+        apply_stylesheet(app, theme='light_blue.xml', invert_secondary=True, extra=extra)
 
-    # # run
-    window.showFullScreen()
-# finally:
-    # start the app
-    sys.exit(app.exec_())
+        # # run
+        window.showFullScreen()
+    finally:
+        # start the app
+        sys.exit(app.exec_())
 
 
 if __name__ == '__main__':

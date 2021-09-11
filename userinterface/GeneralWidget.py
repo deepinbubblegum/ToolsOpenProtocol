@@ -10,9 +10,7 @@ from model.SQLControler import sqlControler
 
 class ForSizeOnlyDelegate(QItemDelegate):
     def sizeHint(self, option, index):
-        # print("sizeHint", index.row(), index.column())
         return QSize(38, 38)
-
 
 class GeneralWidget(QWidget):
     def __init__(self, parent=None):

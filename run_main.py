@@ -6,7 +6,7 @@ import sqlite3
 from system.cmd_OpenProtocol import cmd_OpenProtocol
 from system.OpenProtocol import OpenProtocol
 from system.socket_tray import socket_tray
-from lib.traySocket import TrayModbus
+from lib.traySocket_v2 import TrayModbusV2
 
 def QuerySQL(SQL):
     conn = sqlite3.connect('./database/openprotocol.db')
@@ -17,6 +17,9 @@ def QuerySQL(SQL):
     conn.close()
     return res_data
 
+def init_socket_led():
+    pass
+
 def main():
     HOST = '10.1.10.22'
     PORT_TOOL = [
@@ -26,7 +29,7 @@ def main():
 
     open = OpenProtocol(HOST, PORT_TOOL[4])
     cmd = cmd_OpenProtocol()
-    tray_modbus = TrayModbus(
+    tray_modbus = TrayModbusV2(
         port='/dev/ttyUSB0', 
         device=0x01, 
         baudrate=19200, 
@@ -46,12 +49,17 @@ def main():
             time.sleep(0.2)
             continue
         open.SetData(None)
-
-        while True:
-            open.send_msg(cmd.Linking_Group_info_subscribe())
-            time.sleep(1)
-            open.send_msg(cmd.Linking_Group_info_acknowledge())
-            time.sleep(2)
+        
+        # { #example data from mPro400gc
+        # 'Linking_Group_ID': '01', 'Linking_Group_status': '0', 
+        # 'Linking_Group_batch_mode': '1', 'Linking_Group_batch_size': '0005', 
+        # 'Linking_Group_batch_counter': '0000', 
+        # 'Time_stamp': datetime.datetime(2021, 9, 11, 18, 23, 46)
+        # }
+        
+        socket_hole.set_init_Socket(2, 0x00F)
+        open.send_msg(cmd.Linking_Group_info_subscribe())
+        init_socket_led()
 
         if open.send_msg(cmd.Vehicle_Id_Number_upload_subscribe()) is True:
             res_VIN_CODE = open.Get_VIN_Number_CODE()
