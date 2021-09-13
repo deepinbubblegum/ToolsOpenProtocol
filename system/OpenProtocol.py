@@ -3,8 +3,8 @@ import threading
 import time
 from datetime import datetime
 from collections import deque 
-from system.cmd_OpenProtocol import cmd_OpenProtocol
-from system.data_info import Data_info
+from cmd_OpenProtocol import cmd_OpenProtocol
+from data_info import Data_info
 
 class OpenProtocol:
     def __init__(self, host, port):
@@ -18,7 +18,7 @@ class OpenProtocol:
         
         self.cmd = cmd_OpenProtocol()
         self.send_msg(self.cmd.Communication_stop())
-        time.sleep(0.5)
+        time.sleep(1)
         self.send_msg(self.cmd.Communication_start())
         
         print('Clear socket pipe line.')
@@ -54,15 +54,15 @@ class OpenProtocol:
             self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.conn.connect((self.server, self.port))
             self.send_msg(self.cmd.Communication_stop())
-            time.sleep(0.2)
+            time.sleep(1)
             self.send_msg(self.cmd.Communication_start())
-            time.sleep(0.2)
+            time.sleep(1)
         except ArithmeticError:
             time.sleep(1)
 
     def send_msg(self, send_msg):
         try:
-            time.sleep(0.01)
+            time.sleep(0.2)
             send_msg = send_msg.encode('ascii')
             self.conn.sendall(send_msg)
             return True
@@ -205,7 +205,7 @@ class OpenProtocol:
             # 006300350010        0101020031040005050000062021-09-10:13:59:32
             self.Rev_num_msg = msg[8:11]
             self.No_ack_flag = msg[11:12]
-            print(msg)
+            # print(msg)
             Linking_Group_ID = msg[22:24]
             Linking_Group_status = msg[26:27]
             Linking_Group_batch_mode = msg[29:30]
@@ -220,7 +220,7 @@ class OpenProtocol:
                 'Linking_Group_batch_counter' : Linking_Group_batch_counter,
                 'Time_stamp' : Time_stamp
             }
-            print(self.link_group_select)
+            # print(self.link_group_select)
             self.res_Linking_Group_info_acknowledge()
         
         elif recv_mid == '0011':
@@ -255,7 +255,7 @@ class OpenProtocol:
                     thread.start()
             except Exception as e:
                 pass
-            time.sleep(0.001)
+            time.sleep(0.05)
             
     def get_recv(self):
         if self.deque:

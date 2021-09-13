@@ -1,6 +1,6 @@
 import threading
 import time
-from system.cmd_OpenProtocol import cmd_OpenProtocol
+from cmd_OpenProtocol import cmd_OpenProtocol
 
 class socket_tray():
     def __init__(self, tray_modbus, open):
