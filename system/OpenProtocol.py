@@ -241,6 +241,14 @@ class OpenProtocol:
     def GetData(self):
         return self.Data
     
+    def Get_link_group_select(self):
+        val = self.link_group_select
+        self.link_group_select = None
+        return val
+    
+    def Set_link_group_select(self):
+        self.link_group_select = None
+    
     def SetData(self, value):
         self.Data = value
       
