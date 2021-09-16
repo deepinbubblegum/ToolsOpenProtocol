@@ -3,8 +3,8 @@ import threading
 import time
 from datetime import datetime
 from collections import deque 
-from cmd_OpenProtocol import cmd_OpenProtocol
-from data_info import Data_info
+from system.cmd_OpenProtocol import cmd_OpenProtocol
+from system.data_info import Data_info
 
 class OpenProtocol:
     def __init__(self, host, port):
@@ -231,9 +231,16 @@ class OpenProtocol:
             self.Application_numbers_of_the_torque_controller = msg[23: 23 + (3 * int(self.Number_of_valid_Application))]
         elif recv_mid:
             print(msg)
-      
+    
+    def getSelectLink(self):
+        val = self.link_group_select
+        self.link_group_select = None
+        return val
+    
     def Get_VIN_Number_CODE(self):
-        return self.VIN_Number_CODE
+        val = self.VIN_Number_CODE
+        self.VIN_Number_CODE = None
+        return val
 
     def Set_VIN_Number_CODE(self, value):
         self.VIN_Number_CODE = value

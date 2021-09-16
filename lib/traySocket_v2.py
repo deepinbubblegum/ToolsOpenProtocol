@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from socket import socket
 import minimalmodbus
 import serial
 import time
@@ -34,77 +35,134 @@ class TrayModbusV2():
             0x000,0x000,0x000,0x000
         ]
         
+        self.socket_enable = [0,0,0,0,0,0,0,0]
+        self.socket_ready = False
+        self.socket_get = -1
+        self.led_color_disable = 0x000
+        self.led_color_enable = 0xFF0
+        self.led_color_error = 0xF00
+        self.led_color_pickup = 0x00F
+        self.led_color_picked = 0x0F0
+    
         self.color_rgb = [0xF00, 0x0F0, 0x00F, 0x000]
-        self.color_g_bing = [0x000, 0x0F0]
+        self.list_set = []
+        
+        self.thread_event_socket = threading.Thread(target=self.event_socket_tray)
+        self.thread_event_socket.daemon = True
+        self.thread_event_socket.start()
         
         self.thread_tray_socket = threading.Thread(target=self.Thread_Tray_socket)
         self.thread_tray_socket.daemon = True
         self.thread_tray_socket.start()
         
-        # self.thread_event_socket = threading.Thread(target=self.event_socket_tray)
-        # self.thread_event_socket.daemon = True
-        # self.thread_event_socket.start()
-
+        self.thread_tray_socket_led = threading.Thread(target=self.Thread_Tray_socket_led)
+        self.thread_tray_socket_led.daemon = True
+        self.thread_tray_socket_led.start()
+        
+    def Thread_Tray_socket_led(self):
+        while True:
+            self.led_color_pickup = 0x0F0
+            time.sleep(0.25)
+            self.led_color_pickup = 0x000
+            time.sleep(0.25)
+            
     def Thread_Tray_socket(self):
         while True:
-            for idx_add in range(len(self.socket_tray)):
-                try:
-                    self.socket_tray[idx_add] = self.read_register(
-                        registeraddress = idx_add,
-                        numberOfDecimals = 0,
-                        functioncode = 4,
-                        signed = False
-                    )
-                    self.write_register(
-                        registeraddress=idx_add, 
-                        value=self.leds_socket_tray[idx_add],
-                        mode=0
-                    )
-                except Exception as e:
-                    pass
-                
+            try:
+                self.socket_tray = self.read_registers(
+                    registeraddress = 0,
+                    numberOfDecimals = 8,
+                    functioncode = 4
+                )
+                #print(self.socket_tray)
+                self.write_registers(
+                    registeraddress = 0, 
+                    value=self.leds_socket_tray
+                )
+            except Exception as e:
+                print(e)
+    
     def event_socket_tray(self):
-        idx_bing_led = 0
         while True:
-            for idx in range(len(self.socket_tray)):
-                if bool(self.socket_tray[idx]) is False and (idx + 1) != self.socket_pickup:
-                    self.leds_socket_tray[idx] = self.color_rgb[2]
-                elif bool(self.socket_tray[idx]) is False and (idx + 1) == self.socket_pickup:
-                    self.leds_socket_tray[idx] = self.color_rgb[1]
-                elif bool(self.socket_tray[idx]) and (idx + 1) == self.socket_pickup:
-                    self.leds_socket_tray[idx] = self.color_g_bing[idx_bing_led]
-                elif bool(self.socket_tray[idx]) and (idx + 1) != self.socket_pickup:
-                    self.leds_socket_tray[idx] = self.color_rgb[0]  
-            if idx_bing_led >= 1:
-                idx_bing_led = 0
+            all_socket_ready = True
+            for i in range(8):
+                # print('Enable',self.socket_enable)
+                # print('Sensor',self.socket_tray)
+                if self.socket_enable[i] == 1: 
+                    if self.socket_tray[i] == 0:
+                        # print('socket active {}'.format(i))
+                        self.leds_socket_tray[i] = self.led_color_enable
+                    else:
+                        if self.socket_get != i:
+                            self.leds_socket_tray[i] = self.led_color_error
+                            all_socket_ready = False     
+                else:
+                    self.leds_socket_tray[i] = self.led_color_disable
+                    
+            if all_socket_ready is True:
+                if self.socket_get >= 0 and self.socket_get < 8:
+                    if self.socket_tray[self.socket_get] == 1:
+                        self.leds_socket_tray[self.socket_get] = self.led_color_picked
+                        self.socket_ready = True
+                    else:
+                        self.leds_socket_tray[self.socket_get] = self.led_color_pickup
+                        self.socket_ready = False
+                else:
+                    self.socket_ready = False
             else:
-                idx_bing_led += 1
-            time.sleep(0.25)
-
+                self.socket_ready = False
+            # print('Commnd',self.leds_socket_tray)
+            time.sleep(0.1)
+         
     def set_socket_pickup(self, value):
-        self.socket_pickup = value
+        self.socket_pickup = value   
         
     def get_socket_pickup(self):
         return self.socket_tray
+            
+    def setledOn_formDB(self, idx):
+        self.list_set.append(idx)
+        self.leds_socket_tray[idx] = 0xF00
         
-    def write_register(self, registeraddress, value, mode=0):
-        self.instrument.write_register(registeraddress, value, mode)
-
-    def read_register(self, registeraddress, mode=0):
-        res_value = self.instrument.read_register(
-            registeraddress, 
-            mode
-        )  # Registernumber, number of decimals
-        return hex(res_value)
-    
-    def read_register(self, registeraddress, numberOfDecimals = 0, functioncode = 4, signed = False):
-        registervalue = self.instrument.read_register(
+    def setledOn_reset(self):
+        self.list_set = []
+        
+    def read_registers(self, registeraddress, numberOfDecimals = 0, functioncode = 4):
+        registervalue = self.instrument.read_registers(
             registeraddress,
             numberOfDecimals,
-            functioncode,
-            False
+            functioncode
         )
         return registervalue
+    
+    def setEnable(self, idx):
+        self.socket_enable[idx] = 1
+        
+    def setDisable(self, idx):
+        self.socket_enable[idx] = 0
+        
+    def get_socket_ready(self):
+        return self.socket_ready
+    
+    def pick_id(self, val):
+        self.socket_get = val
+    
+    def write_registers(self, registeraddress, value):
+        self.instrument.write_registers(registeraddress, value)
+        
+# def main():
+#     tray_modbus = TrayModbusV2(
+#         port='/dev/ttyUSB0', 
+#         device=0x01, 
+#         baudrate=19200, 
+#         bytesize = 8, 
+#         parity=serial.PARITY_NONE, 
+#         stopbits=1, 
+#         timeout=0.05
+#     )
+#     while True:
+#         time.sleep(1)
+    
 
-    def close(self):
-        self.instrument.serial.close()
+# if __name__=='__main__':
+#     main()
