@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import time
 import serial
 import sqlite3
@@ -107,11 +108,11 @@ def main():
     tray_modbus = TrayModbusV2(
         port='/dev/ttyUSB0', 
         device=0x01, 
-        baudrate=19200, 
+        baudrate=9600, 
         bytesize = 8, 
         parity=serial.PARITY_NONE, 
         stopbits=1, 
-        timeout=0.05
+        timeout=1
     )
     
     # oparations
