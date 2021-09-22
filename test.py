@@ -103,7 +103,7 @@ def main():
             port=port[0]
             )
         )
-        
+    
     # initialize Tray
     tray_modbus = TrayModbusV2(
         port='/dev/ttyUSB0', 
@@ -163,7 +163,6 @@ def main():
                     if int(res_last_tigh['Tightening_Status']):
                         #_tools_pool[tools_init-1].disableTool()
                         checked += 1
-            
                         print('Tightening :OK')
                     else:
                         print('Tightening :NOK')

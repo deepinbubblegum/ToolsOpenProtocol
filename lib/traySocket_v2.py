@@ -86,7 +86,6 @@ class TrayModbusV2():
             socket_tray_data = self.modbus[id].read_registers(0,8,4)
         except Exception as e:
             print(e)
-                
         return socket_tray_data
     
     def writeSocketTrayLED(self,id,data):
@@ -144,7 +143,13 @@ class TrayModbusV2():
         
     def get_socket_pickup(self):
         return self.socket_tray
-            
+    
+    def get_tray_enable(self):
+        return self.tray_enable
+    
+    def get_socket_enable(self):
+        return self.socket_enable
+      
     def setledOn_formDB(self, idx):
         self.list_set.append(idx)
         self.leds_socket_tray[idx] = 0xF00
