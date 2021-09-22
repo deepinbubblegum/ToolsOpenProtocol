@@ -6,7 +6,7 @@ from threading import Thread
 from system.OpenProtocol import OpenProtocol
 from system.cmd_OpenProtocol import cmd_OpenProtocol
 from model.SQLControler import sqlControler
-from lib.traySocket_v2 import TrayModbusV2
+# from lib.traySocket_v2 import TrayModbusV2
 
 class ctl_core():
     def __init__(self, ip_address, port):
@@ -81,10 +81,11 @@ def step_link_SQLtxt(tool, link):
     return SQLtxt
 
 def findTools(Tools):
+    Tools_key = []
     for key, vin in Tools.items():
         if vin is not None:
-            return key
-    return None 
+            Tools_key.append(key)
+    return Tools_key 
     
 def main():
     # initialize variable
@@ -105,15 +106,15 @@ def main():
         )
     
     # initialize Tray
-    tray_modbus = TrayModbusV2(
-        port='/dev/ttyUSB0', 
-        device=0x01, 
-        baudrate=9600, 
-        bytesize = 8, 
-        parity=serial.PARITY_NONE, 
-        stopbits=1, 
-        timeout=1
-    )
+    # tray_modbus = TrayModbusV2(
+    #     port='/dev/ttyUSB0', 
+    #     device=0x01, 
+    #     baudrate=9600, 
+    #     bytesize = 8, 
+    #     parity=serial.PARITY_NONE, 
+    #     stopbits=1, 
+    #     timeout=1
+    # )
     
     # oparations
     while True:
@@ -121,10 +122,13 @@ def main():
         old_position = None
         for _tools in _tools_pool:
             tools_id, res_vin_code = _tools.getTools_ready()
-            Tools[tools_id] = res_vin_code
-            time.sleep(0.02)
+            if res_vin_code is not None:
+                
+                Tools[tools_id] = res_vin_code
+                time.sleep(0.02)
         
-        tools_init = findTools(Tools)
+        # tools_init = findTools(Tools)
+        
         if tools_init is not None:
             # print(tools_init)
             #_tools_pool[tools_init-1].set_tray_modbus(tray_modbus)
@@ -132,8 +136,8 @@ def main():
             Linking_ID = _tools_pool[tools_init-1].getTool_link()['Linking_Group_ID']
             # print(res['Linking_Group_ID'])
             res_socket_list = conn_db.db_QuerySQL(socket_link_SQLtxt(tools_init, Linking_ID))
-            for socket in res_socket_list:
-                tray_modbus.setEnable(int(socket[0])-1)
+            # for socket in res_socket_list:
+            #     tray_modbus.setEnable(int(socket[0])-1)
             res_steps_socket = conn_db.db_QuerySQL(step_link_SQLtxt(tools_init, Linking_ID))
             _tools_pool[tools_init-1].last_tight_none()
             while True:
@@ -149,15 +153,15 @@ def main():
                     print('exit loop')
                     break
                 
-                tray_modbus.pick_id((res_socket_list[checked][0])-1)
+                # tray_modbus.pick_id((res_socket_list[checked][0])-1)
                 print(res_socket_list[checked][0]-1)
                 
                 res_last_tigh = _tools_pool[tools_init-1].last_tightening_result()
                 
-                if tray_modbus.get_socket_ready():
-                    _tools_pool[tools_init-1].enableTool()
-                else:
-                    _tools_pool[tools_init-1].disableTool()
+                # if tray_modbus.get_socket_ready():
+                #     _tools_pool[tools_init-1].enableTool()
+                # else:
+                #     _tools_pool[tools_init-1].disableTool()
                     
                 if res_last_tigh is not None:
                     if int(res_last_tigh['Tightening_Status']):
@@ -173,7 +177,7 @@ def main():
                     old_position = res_last_tigh['Batch_counter']
                     _tools_pool[tools_init-1].last_tight_none()
                 time.sleep(0.01)
-            tray_modbus.pick_id(-1)
+            # tray_modbus.pick_id(-1)
             print('end cycle position')
         time.sleep(0.01)
     

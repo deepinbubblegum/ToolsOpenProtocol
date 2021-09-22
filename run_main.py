@@ -65,7 +65,10 @@ def main():
             res_VIN_CODE = open.Get_VIN_Number_CODE()
             if res_VIN_CODE is None:
                 continue
-            print(res_VIN_CODE)
+            
+            # print(res_VIN_CODE)
+            
+            
             while True:
                 loop = len(res_step)
                 try:
