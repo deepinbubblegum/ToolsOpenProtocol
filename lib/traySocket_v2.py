@@ -149,6 +149,12 @@ class TrayModbusV2():
     
     def get_socket_enable(self):
         return self.socket_enable
+    
+    def set_tray_enable(self, value):
+        self.tray_enable = value
+    
+    def set_socket_enable(self, value):
+        self.socket_enable = value
       
     def setledOn_formDB(self, idx):
         self.list_set.append(idx)
