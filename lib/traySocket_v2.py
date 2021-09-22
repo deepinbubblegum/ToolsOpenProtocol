@@ -7,37 +7,51 @@ import threading
 
 class TrayModbusV2():
     def __init__(self, port='/dev/ttyUSB0', device=0x01, baudrate=19200, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=1):
-        self.instrument = minimalmodbus.Instrument(
-            port, device)  # port name, slave address (in decimal)
-        self.instrument.serial.port                     # this is the serial port name
-        self.instrument.serial.baudrate = baudrate         # Baud
-        self.instrument.serial.bytesize = bytesize
-        self.instrument.serial.parity = parity
-        self.instrument.serial.stopbits = stopbits
-        self.instrument.serial.timeout = timeout          # seconds
-
-        # this is the slave address number
-        self.instrument.address
-        self.instrument.mode = minimalmodbus.MODE_RTU   # rtu or ascii mode
-        self.instrument.clear_buffers_before_each_transaction = True
-
+        self.modbus = [
+            minimalmodbus.Instrument(port, 1), 
+            minimalmodbus.Instrument(port, 2),
+            minimalmodbus.Instrument(port, 3),
+            minimalmodbus.Instrument(port, 4),
+            minimalmodbus.Instrument(port, 5),
+            minimalmodbus.Instrument(port, 6),
+            minimalmodbus.Instrument(port, 7),
+            minimalmodbus.Instrument(port, 8)
+        ]
+        
+        self.modbus[0].serial.baudrate = baudrate         # Baud
+        self.modbus[0].serial.bytesize = bytesize
+        self.modbus[0].serial.parity = parity
+        self.modbus[0].serial.stopbits = stopbits
+        self.modbus[0].serial.timeout = timeout          # seconds
+        self.modbus[0].mode = minimalmodbus.MODE_RTU   # rtu or ascii mode
+        self.modbus[0].clear_buffers_before_each_transaction = True
+        for i in range(8):
+            self.modbus[i] = minimalmodbus.Instrument(port, i+1)
+            
         self.socket_pickup = None
         self.bing_picked = False
 
         self.socket_tray_check_obj = False
-        self.socket_tray = [
+        self.tray_enable = [0,0,0,0,0,0,0,0]
+        self.socket_enable = [8][0,0,0,0,0,0,0,0]
+        self.socket_tray_sensor = [8][
             0,0,0,0,
             0,0,0,0
         ]
-        
-        self.leds_socket_tray = [
+
+        self.leds_socket_tray = [8][
             0x000,0x000,0x000,0x000,
             0x000,0x000,0x000,0x000
         ]
         
-        self.socket_enable = [0,0,0,0,0,0,0,0]
-        self.socket_ready = False
-        self.socket_get = -1
+        self.leds_socket_tray_prev = [8][
+            0x000,0x000,0x000,0x000,
+            0x000,0x000,0x000,0x000
+        ]
+
+        self.socket_ready[8] = False
+        self.socket_get[8] = [-1,-1,-1,-1,-1,-1,-1,-1]
+        
         self.led_color_disable = 0x000
         self.led_color_enable = 0xFF0
         self.led_color_error = 0xF00
@@ -66,22 +80,33 @@ class TrayModbusV2():
             self.led_color_pickup = 0x000
             time.sleep(0.25)
             
+    def readSocketTraySensor(self,id):
+        socket_tray_data = [-1,-1,-1,-1,-1,-1,-1,-1]
+        try:
+            socket_tray_data = self.modbus[id].read_registers(0,8,4)
+        except Exception as e:
+            print(e)
+                
+        return socket_tray_data
+    
+    def writeSocketTrayLED(self,id,data):
+        try:
+            self.modbus[id].write_registers(0, data)
+        except Exception as e:
+            print(e)
+    
     def Thread_Tray_socket(self):
         while True:
-            try:
-                self.socket_tray = self.read_registers(
-                    registeraddress = 0,
-                    numberOfDecimals = 8,
-                    functioncode = 4
-                )
-                #print(self.socket_tray)
-                self.write_registers(
-                    registeraddress = 0, 
-                    value=self.leds_socket_tray
-                )
-            except Exception as e:
-                print(e)
-    
+            for i in range(8):
+                if self.tray_enable[i] >= 1:
+                    self.socket_tray_sensor[i] = self.readSocketTraySensor(i)
+            
+            for i in range(8):
+                if self.tray_enable[i] >= 1:
+                    if self.leds_socket_tray[i] != self.leds_socket_tray_prev[i]:
+                        self.leds_socket_tray_prev[i] =self.leds_socket_tray[i]
+                        self.writeSocketTrayLED(id,self.leds_socket_tray[i])
+
     def event_socket_tray(self):
         while True:
             all_socket_ready = True
