@@ -133,8 +133,6 @@ def thr_socket_step(_tools_init, _tool, conn_db):
     # tray_modbus.pick_id(-1)
     print('end cycle position')
         
-
-    
 def main():
     # initialize variable
     _port_tools = []
