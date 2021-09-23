@@ -87,8 +87,53 @@ def findTools(Tools):
             Tools_key.append(key)
     return Tools_key
 
-def thr_socket_step(_tool):
-    pass
+def thr_socket_step(_tools_init, _tool, conn_db):
+    Linking_ID = _tool.getTool_link()['Linking_Group_ID']
+    res_socket_list = conn_db.db_QuerySQL(socket_link_SQLtxt(_tools_init, Linking_ID))
+    # res_socket_list is list socket not duplicate 
+    res_steps_socket = conn_db.db_QuerySQL(step_link_SQLtxt(_tools_init, Linking_ID))
+    _tool.last_tight_none()
+    while True:
+        print('Start Loop')
+        loop = len(res_steps_socket)
+        try:
+            res_steps_socket[checked][1]
+        except Exception as e:
+            break
+    
+        if loop == checked:
+            checked = 0
+            print('exit loop')
+            break
+        
+        # tray_modbus.pick_id((res_socket_list[checked][0])-1)
+        print(res_socket_list[checked][0]-1)
+        
+        res_last_tigh = _tool.last_tightening_result()
+        
+        # if tray_modbus.get_socket_ready():
+        #     _tool.enableTool()
+        # else:
+        #     _tool.disableTool()
+            
+        if res_last_tigh is not None:
+            if int(res_last_tigh['Tightening_Status']):
+                #_tool.disableTool()
+                checked += 1
+                print('Tightening :OK')
+            else:
+                print('Tightening :NOK')
+                if old_position != res_last_tigh['Batch_counter']:
+                    #_tool.disableTool()
+                    checked += 1
+                    # _tool.set_NextPosition()
+            old_position = res_last_tigh['Batch_counter']
+            _tool.last_tight_none()
+        time.sleep(0.01)
+    # tray_modbus.pick_id(-1)
+    print('end cycle position')
+        
+
     
 def main():
     # initialize variable
@@ -121,7 +166,7 @@ def main():
         if len(tools_init) > 0:
             # start thr
             thr_tools_pool.append(
-                Thread(target=thr_socket_step, args=(_tools_pool[tools_init-1],))
+                Thread(target=thr_socket_step, args=(tools_init, _tools_pool[tools_init-1], conn_db,))
             )
             thr_tools_pool[tools_init-1].daemon = True
             thr_tools_pool[tools_init-1].start()
