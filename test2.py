@@ -88,6 +88,7 @@ def findTools(Tools):
     return Tools_key
 
 def thr_socket_step(_tools_init, _tool, conn_db):
+    checked = 0
     Linking_ID = _tool.getTool_link()['Linking_Group_ID']
     res_socket_list = conn_db.db_QuerySQL(socket_link_SQLtxt(_tools_init, Linking_ID))
     # res_socket_list is list socket not duplicate 
