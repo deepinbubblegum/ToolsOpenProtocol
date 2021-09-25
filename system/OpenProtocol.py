@@ -11,14 +11,20 @@ class OpenProtocol:
         self.server = host
         self.port = port
         self.dataInfo = Data_info()
-        self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.conn.connect((self.server, self.port))
+        try:
+            self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.conn.connect((self.server, self.port))
+        except AttributeError:
+            self.reconnect_pipe()
 
+        self.recv_flag = False
+        self.recv_timeout = 200
+        
         print('Intitialize network socket connected.')
         
         self.cmd = cmd_OpenProtocol()
         self.send_msg(self.cmd.Communication_stop())
-        time.sleep(1)
+        # time.sleep(1)
         self.send_msg(self.cmd.Communication_start())
         
         print('Clear socket pipe line.')
@@ -42,7 +48,10 @@ class OpenProtocol:
         self.deque = deque(maxlen=1)
         print('Initialize valable begin')
 
+        
+        
     def recv_filter(self, recv_msg):
+        self.recv_flag = True
         recv_msg = recv_msg.decode('ascii')
         # recv_msg = recv_msg.split(" ")
         # array_list = list(filter(None, recv_msg))
@@ -62,10 +71,18 @@ class OpenProtocol:
 
     def send_msg(self, send_msg):
         try:
-            time.sleep(0.2)
+            # time.sleep(0.2)
+            # print("send_msg=",send_msg)
             send_msg = send_msg.encode('ascii')
             self.conn.sendall(send_msg)
-            return True
+            self.recv_flag = False
+            recv_timecount = self.recv_timeout
+            while self.recv_flag is False and recv_timecount > 0:
+                recv_timecount = recv_timecount - 1
+                # print("timeout=",recv_timecount)
+                time.sleep(0.001) 
+            return self.recv_flag
+        
         except Exception as err:
             self.close()
             self.reconnect_pipe()
@@ -232,7 +249,8 @@ class OpenProtocol:
         elif recv_mid:
             print(msg)
     
-    def getSelectLink(self):
+
+    def getLinking_Group_Info(self):
         val = self.link_group_select
         self.link_group_select = None
         return val
