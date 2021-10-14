@@ -400,8 +400,15 @@ def main():
                     _tools.enableTool()
                     print(" tool ", tools_id + 1, " enableTool")
                 else:
-                    _tools.disableTool()
-                    print(" tool ", tools_id + 1, " disableTool")
+                    # check by pass
+                    bypass_tool_id = tools_id + 1
+                    res_bypass = conn_db.db_get_bypass_tool(bypass_tool_id)
+                    if bool(res_bypass) == False:
+                        _tools.disableTool()
+                        print(" tool ", tools_id + 1, " disableTool")
+                    else:
+                        _tools.enableTool()
+                        print(" tool ", tools_id + 1, " ByPassTool")
                     
         #Write Tray Led ===============================
         for tray in range(len(socket_tray_enable)):   
