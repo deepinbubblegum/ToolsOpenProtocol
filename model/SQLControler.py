@@ -24,6 +24,31 @@ class sqlControler():
         self.conn.commit()
         self.conn.close()
         
+    def db_update_bypass(self, id_tool, value):
+        self.conn = self.create_connection()
+        sql = '''
+            UPDATE Tools
+            SET By_pass = (?)
+            WHERE ID_Tools = (?)
+            '''
+        cur = self.conn.cursor()
+        cur.execute(sql, (value, id_tool,))
+        self.conn.commit()
+        self.conn.close()
+        
+    def db_get_bypass_tool(self, id_tool):
+        self.conn = self.create_connection()
+        sql = '''
+            SELECT By_pass 
+            FROM Tools WHERE 
+            ID_Tools = (?)
+            '''
+        cur = self.conn.cursor()
+        cur.execute(sql, (id_tool,))
+        res_data = cur.fetchall()
+        self.conn.close()
+        return res_data[0][0]
+        
     def db_QuerySQL(self, SQL):
         self.conn = self.create_connection()
         cur = self.conn.cursor()

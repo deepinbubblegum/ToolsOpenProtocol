@@ -58,18 +58,22 @@ class GeneralWidget(QWidget):
         label_Tools = QLabel("Tools :")
         self.combo_Tools = QComboBox(self)
         for row in res_tools:
+            print(row)
             self.combo_Tools.addItem(row[1])
 
         self.combo_Tools.currentIndexChanged.connect(
-            self.on_combo_Tools_changed)
+            self.on_combo_Tools_changed
+        )
         self.combo_Tools.setCurrentIndex(0)
 
-        toggle_ByPass = AnimatedToggle(
+        self.toggle_ByPass = AnimatedToggle(
             checked_color="#FFB000",
             pulse_checked_color="#44FFB000"
         )
-        toggle_ByPass.adjustSize()
+        self.toggle_ByPass.adjustSize()
         label_ByPass = QLabel("By Pass :")
+        
+        self.toggle_ByPass.clicked.connect(self.change_byPass)
 
         label_Link_ID = QLabel("Link ID :")
         self.combo_Link_ID = QComboBox(self)
@@ -80,7 +84,7 @@ class GeneralWidget(QWidget):
         HLayout2.addWidget(self.combo_Tools, 3)
 
         HLayout2.addWidget(label_ByPass)
-        HLayout2.addWidget(toggle_ByPass)
+        HLayout2.addWidget(self.toggle_ByPass)
 
         HLayout2.addWidget(label_Link_ID)
         HLayout2.addWidget(self.combo_Link_ID, 1)
@@ -125,6 +129,28 @@ class GeneralWidget(QWidget):
         self.GetDataTRAY()
         
         self.getIpAddress()
+        self.check_tools_bypass()
+        
+    def change_byPass(self):
+        if self.toggle_ByPass.isChecked():
+            self._sqlControler.db_update_bypass(
+                self.Select_Tools_Value,
+                1
+            )
+        else:
+            self._sqlControler.db_update_bypass(
+                self.Select_Tools_Value,
+                0
+            )
+            
+    def check_tools_bypass(self):
+        res_bypass = self._sqlControler.db_get_bypass_tool(
+            self.Select_Tools_Value
+        )
+        if bool(res_bypass):
+            self.toggle_ByPass.setChecked(True)
+        else:
+            self.toggle_ByPass.setChecked(False)
         
     def on_click_Ip_save(self):
         msgBox = QMessageBox()
@@ -176,6 +202,7 @@ class GeneralWidget(QWidget):
     def on_combo_Tools_changed(self, value):
         # print('Tools', value)
         self.Select_Tools_Value = value + 1
+        self.check_tools_bypass()
         self.getDataStep()
 
     def on_combo_Link_changed(self, value):
