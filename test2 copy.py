@@ -35,7 +35,7 @@ class ctl_core():
         
         # init_disable
         # self._open_pro.send_msg(self._open_cmd.Disable_tool())
-        # time.sleep(1)
+        time.sleep(1)
         
         self.thr_tool = Thread(target=self._tool_sys)
         self.thr_tool.daemon = True
@@ -47,13 +47,8 @@ class ctl_core():
             try:
                 if self.linking_group_data is None:
                     self.linking_group_data = self.getLinking_Group_Info()
-                else:
-                    self.last_tightening_result()
-                    print(self.tools_id," : GET LAST RES")
-                #print(self.tools_id," : GET INFO")
-                time.sleep(1)
+                time.sleep(0.1)
             except Exception as err:
-                print("ERR")
                 pass
 
     def getInfo(self):
@@ -133,12 +128,12 @@ def main():
         None,None,None,None,
         None,None,None,None
     ]
-    socket_tray_led_color_pickup = 33
-    socket_tray_led_color_picked = 3
-    socket_tray_led_color_error = 1
-    socket_tray_led_color_return = 11
-    socket_tray_led_color_idle = 2
-    socket_tray_led_color_off = 0
+    socket_tray_led_color_pickup = 0x0F0
+    socket_tray_led_color_picked = 0x0F0
+    socket_tray_led_color_error = 0xF00
+    socket_tray_led_color_return = 0xF00
+    socket_tray_led_color_idle = 0x2F0
+    socket_tray_led_color_off = 0x000
     socket_tray_enable = [
         False,False,False,False,
         False,False,False,False,
@@ -230,11 +225,11 @@ def main():
     tray_modbus = TrayModbusV2(
         port='/dev/ttyUSB0', 
         device=0x01, 
-        baudrate=19200, 
+        baudrate=9600, 
         bytesize = 8, 
         parity=serial.PARITY_NONE, 
         stopbits=1, 
-        timeout=1
+        timeout=0.5
     )    
     print("Run2")
     
@@ -258,16 +253,14 @@ def main():
         
     print("Run3")
     
-    blink = True
-    
     while True:
         
-        # if blink is True:
-        #     blink = False
-        # else:
-        #     blink = True
+        if blink is True:
+            blink = False
+        else:
+            blink = True
             
-        time.sleep(0.1)
+        # time.sleep(0.1)
 
         #Read Tray Sensor =============================
         for tray in range(len(socket_tray_enable)): 
@@ -303,24 +296,8 @@ def main():
                 step_size = linking_group_batch_size
                 
     
-                # print("Tool ", tools_id ," = ",tool_enable[tools_id] , " " , step_run , " " , step_size)
+                #print("Tool ", tools_id ," = ",tool_enable[tools_id] , " " , step_run , " " , step_size)
 
-                str_step = "0"
-                if step_run == step_size:
-                    str_step = "X"
-                else:
-                    str_step = str(step_run + 1)
-                
-                if step_run < step_size:
-                    ss = str(res_steps_socket[step_run][1])
-                else:
-                    ss = "X"
-                
-                try:
-                    print("Tools ", tools_id + 1 ," , Enable : ",tool_enable[tools_id] , " , Link : " , linking_group_id , " , Step : ", str_step , " / " , step_size, " , Socket : " , ss)
-                    print(res_steps_socket)
-                except :
-                    print("out of range " ,step_run )
  
                 db_step_size = len(res_steps_socket)
                 
@@ -481,16 +458,16 @@ def main():
  
                         step_run = linking_group_batch_counter
                         step_size = linking_group_batch_size
-
-                        # print("Tools ", i + 1 ," = ",tool_enable[i] , " " , step_run + 1 , " " , step_size, " " , res_steps_socket[step_run][1])
+    
+                        print("Tool ", i + 1 ," = ",tool_enable[i] , " " , step_run , " " , step_size)
 
                 print(current_time)
                 print("PROX > 1 = Socket Detect / 0 = No Socket")
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][0],socket_tray_sensor[tray][1],socket_tray_sensor[tray][2],socket_tray_sensor[tray][3]))
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][4],socket_tray_sensor[tray][5],socket_tray_sensor[tray][6],socket_tray_sensor[tray][7]))
-                print("LED > 11 = Return | 1 = NoSocket | 3 = Picked | 33 = Pickup | 2 = Normal")
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][0],socket_tray_led[tray][1],socket_tray_led[tray][2],socket_tray_led[tray][3]))
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][4],socket_tray_led[tray][5],socket_tray_led[tray][6],socket_tray_led[tray][7]))
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_sensor[tray][0],socket_tray_sensor[tray][1],socket_tray_sensor[tray][2],socket_tray_sensor[tray][3]))
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_sensor[tray][4],socket_tray_sensor[tray][5],socket_tray_sensor[tray][6],socket_tray_sensor[tray][7]))
+                print("LED > F00 = Return / 0F0 = OK / 2F0 = Idle")
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_led[tray][0],socket_tray_led[tray][1],socket_tray_led[tray][2],socket_tray_led[tray][3]))
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_led[tray][4],socket_tray_led[tray][5],socket_tray_led[tray][6],socket_tray_led[tray][7]))
                 print("==============================")
                     
                 if list(socket_tray_led_prev[tray]) != list(socket_tray_led[tray]):
@@ -498,6 +475,86 @@ def main():
                     tray_modbus.writeSocketTrayLED(tray,list(socket_tray_led[tray]))
                     a = list(socket_tray_led[tray])
                     socket_tray_led_prev[tray] = a
+         
+                
+        
+        # for tray in range(len(socket_tray_enable)):
+        #     if socket_tray_enable[tray] is True:
+        #         socket_tray_input[tray] = list(tray_modbus.readSocketTraySensor(tray))
+                
+                
+                  
+        # for tray in range(len(socket_tray_enable)):   
+        #     if socket_tray_enable[tray] is True:   
+        #         print(tray," read = ",socket_tray_input[tray])
+        #         print(tray," led = ",socket_tray_led[tray])  
+        #         print(tray," prev = ",socket_tray_led_prev[tray])     
+        #         if socket_tray_led_prev[tray] != socket_tray_led[tray]:
+        #             print(tray," write = ",socket_tray_led[tray])         
+        #             tray_modbus.writeSocketTrayLED(tray,list(socket_tray_led[tray]))
+        #             socket_tray_led_prev[tray] = socket_tray_led[tray]
+         
+        #         print(tray," prev2 = ",socket_tray_led_prev[tray])             
+                    
+        # _socket_tray_input = socket_tray_input
+        
+        # print("tray = ",socket_tray_enable)      
+        
+        # tray_modbus.writeSocketTrayLED(0,[0xF00,0xF00,0xF00,0xF00,0xF00,0xF00,0xF00,0xF00])
+        # time.sleep(0.25)
+        # tray_modbus.writeSocketTrayLED(0,[0x000,0x000,0x000,0x000,0x000,0x000,0x000,0x000])
+        # time.sleep(0.25)
+        # if tools_init is not None:
+        #     # print(tools_init)
+        #     #_tools_pool[tools_init-1].set_tray_modbus(tray_modbus)
+        #     _tools_pool[tools_init-1].setTools_ack()
+        #     Linking_ID = _tools_pool[tools_init-1].getTool_link()['Linking_Group_ID']
+        #     # print(res['Linking_Group_ID'])
+        #     res_socket_list = conn_db.db_QuerySQL(socket_link_SQLtxt(tools_init, Linking_ID))
+        #     # for socket in res_socket_list:
+        #     #     tray_modbus.setEnable(int(socket[0])-1)
+        #     res_steps_socket = conn_db.db_QuerySQL(step_link_SQLtxt(tools_init, Linking_ID))
+        #     _tools_pool[tools_init-1].last_tight_none()
+        #     while True:
+        #         print('Start Loop')
+        #         loop = len(res_steps_socket)
+        #         try:
+        #             res_steps_socket[checked][1]
+        #         except Exception as e:
+        #             break
+            
+        #         if loop == checked:
+        #             checked = 0
+        #             print('exit loop')
+        #             break
+                
+        #         # tray_modbus.pick_id((res_socket_list[checked][0])-1)
+        #         print(res_socket_list[checked][0]-1)
+                
+        #         res_last_tigh = _tools_pool[tools_init-1].last_tightening_result()
+                
+        #         # if tray_modbus.get_socket_ready():
+        #         #     _tools_pool[tools_init-1].enableTool()
+        #         # else:
+        #         #     _tools_pool[tools_init-1].disableTool()
+                    
+        #         if res_last_tigh is not None:
+        #             if int(res_last_tigh['Tightening_Status']):
+        #                 #_tools_pool[tools_init-1].disableTool()
+        #                 checked += 1
+        #                 print('Tightening :OK')
+        #             else:
+        #                 print('Tightening :NOK')
+        #                 if old_position != res_last_tigh['Batch_counter']:
+        #                     #_tools_pool[tools_init-1].disableTool()
+        #                     checked += 1
+        #                     # _tools_pool[tools_init-1].set_NextPosition()
+        #             old_position = res_last_tigh['Batch_counter']
+        #             _tools_pool[tools_init-1].last_tight_none()
+        #         time.sleep(0.01)
+        #     # tray_modbus.pick_id(-1)
+        #     print('end cycle position')
+        # time.sleep(0.01)
     
 if __name__=='__main__':
     main()

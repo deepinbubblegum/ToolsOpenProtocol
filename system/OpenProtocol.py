@@ -101,6 +101,7 @@ class OpenProtocol:
         self.send_msg(self.cmd.Linking_Group_info_acknowledge())
 
     def msg_operation(self, msg):
+        # print(self.port , " : Recv " , msg)
         recv_mid = msg[4:8]
         if recv_mid == '0002': # Communication start acknowledge
             # example recv 006200020020        010000020503                         04ATG

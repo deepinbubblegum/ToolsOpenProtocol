@@ -94,9 +94,9 @@ class TrayModbusV2():
             socket_tray_data = self.modbus[id].read_registers(0,8,4)
             for i in range(len(socket_tray_data)):
                 if socket_tray_data[i] == 0:
-                    socket_tray_data[i] = 1 #invert Data  Have socket = 1
+                    socket_tray_data[i] = 0 #invert Data  Have socket = 0
                 else:
-                    socket_tray_data[i] = 0
+                    socket_tray_data[i] = 1
                     
         except Exception as e:
             print(e)

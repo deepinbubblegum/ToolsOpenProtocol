@@ -133,12 +133,12 @@ def main():
         None,None,None,None,
         None,None,None,None
     ]
-    socket_tray_led_color_pickup = 33
-    socket_tray_led_color_picked = 3
-    socket_tray_led_color_error = 1
-    socket_tray_led_color_return = 11
-    socket_tray_led_color_idle = 2
-    socket_tray_led_color_off = 0
+    socket_tray_led_color_pickup = 0x0F0
+    socket_tray_led_color_picked = 0x0F0
+    socket_tray_led_color_error = 0xF00
+    socket_tray_led_color_return = 0xF00
+    socket_tray_led_color_idle = 0x2F0
+    socket_tray_led_color_off = 0x000
     socket_tray_enable = [
         False,False,False,False,
         False,False,False,False,
@@ -230,11 +230,11 @@ def main():
     tray_modbus = TrayModbusV2(
         port='/dev/ttyUSB0', 
         device=0x01, 
-        baudrate=19200, 
+        baudrate=9600, 
         bytesize = 8, 
         parity=serial.PARITY_NONE, 
         stopbits=1, 
-        timeout=1
+        timeout=0.5
     )    
     print("Run2")
     
@@ -258,14 +258,12 @@ def main():
         
     print("Run3")
     
-    blink = True
-    
     while True:
         
-        # if blink is True:
-        #     blink = False
-        # else:
-        #     blink = True
+        if blink is True:
+            blink = False
+        else:
+            blink = True
             
         time.sleep(0.1)
 
@@ -486,11 +484,11 @@ def main():
 
                 print(current_time)
                 print("PROX > 1 = Socket Detect / 0 = No Socket")
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][0],socket_tray_sensor[tray][1],socket_tray_sensor[tray][2],socket_tray_sensor[tray][3]))
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][4],socket_tray_sensor[tray][5],socket_tray_sensor[tray][6],socket_tray_sensor[tray][7]))
-                print("LED > 11 = Return | 1 = NoSocket | 3 = Picked | 33 = Pickup | 2 = Normal")
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][0],socket_tray_led[tray][1],socket_tray_led[tray][2],socket_tray_led[tray][3]))
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][4],socket_tray_led[tray][5],socket_tray_led[tray][6],socket_tray_led[tray][7]))
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_sensor[tray][0],socket_tray_sensor[tray][1],socket_tray_sensor[tray][2],socket_tray_sensor[tray][3]))
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_sensor[tray][4],socket_tray_sensor[tray][5],socket_tray_sensor[tray][6],socket_tray_sensor[tray][7]))
+                print("LED > F00 = Return / 0F0 = OK / 2F0 = Idle")
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_led[tray][0],socket_tray_led[tray][1],socket_tray_led[tray][2],socket_tray_led[tray][3]))
+                print("{:03X} , {:03X} , {:03X} , {:03X}".format(socket_tray_led[tray][4],socket_tray_led[tray][5],socket_tray_led[tray][6],socket_tray_led[tray][7]))
                 print("==============================")
                     
                 if list(socket_tray_led_prev[tray]) != list(socket_tray_led[tray]):
