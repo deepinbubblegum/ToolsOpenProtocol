@@ -6,7 +6,7 @@ import time
 import threading
 
 class TrayModbusV2():
-    def __init__(self, port='/dev/ttyUSB0', device=0x01, baudrate=19200, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=1):
+    def __init__(self, port='/dev/ttyS0', device=0x01, baudrate=19200, bytesize=8, parity=serial.PARITY_NONE, stopbits=1, timeout=1):
         self.modbus = [
             minimalmodbus.Instrument(port, 1), 
             minimalmodbus.Instrument(port, 2),
@@ -206,7 +206,7 @@ class TrayModbusV2():
         
 # def main():
 #     tray_modbus = TrayModbusV2(
-#         port='/dev/ttyUSB0', 
+#         port='/dev/ttyS0', 
 #         device=0x01, 
 #         baudrate=19200, 
 #         bytesize = 8, 
@@ -215,7 +215,8 @@ class TrayModbusV2():
 #         timeout=0.05
 #     )
 #     while True:
-#         time.sleep(1)
+#         print(tray_modbus.readSocketTraySensor(0))
+#         time.sleep(0.1)
     
 
 # if __name__=='__main__':

@@ -10,10 +10,6 @@ from model.SQLControler import sqlControler
 import numpy as np
 from lib.traySocket_v2 import TrayModbusV2
 
-
-
-
-
 class ctl_core():
     def __init__(self, ip_address, port):
         super().__init__()
@@ -228,7 +224,7 @@ def main():
         
     print("Run1")
     tray_modbus = TrayModbusV2(
-        port='/dev/ttyUSB0', 
+        port='/dev/ttyS0', 
         device=0x01, 
         baudrate=19200, 
         bytesize = 8, 
