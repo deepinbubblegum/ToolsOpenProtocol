@@ -43,9 +43,9 @@ class ctl_core():
             try:
                 if self.linking_group_data is None:
                     self.linking_group_data = self.getLinking_Group_Info()
-                else:
-                    self.last_tightening_result()
-                    print(self.tools_id," : GET LAST RES")
+                #else:
+                    #self.last_tightening_result()
+                    #print(self.tools_id," : GET LAST RES")
                 #print(self.tools_id," : GET INFO")
                 time.sleep(1)
             except Exception as err:
@@ -230,7 +230,7 @@ def main():
         bytesize = 8, 
         parity=serial.PARITY_NONE, 
         stopbits=1, 
-        timeout=1
+        timeout=0.5
     )    
     print("Run2")
     
@@ -239,11 +239,13 @@ def main():
         time.sleep(0.1)
     
     blink = 0xFFFF
-    step_run_prev = [0,0,0,0,0,0,0,0]
-    socket_prev = [None,None,None,None,None,None,None,None]
-    tray_prev = [None,None,None,None,None,None,None,None]
-    tool_enable = [False,False,False,False,False,False,False,False]
-    tool_enable_prev = [None,None,None,None,None,None,None,None]
+    step_run_prev = [0,0,0,0,0,0,0,0,0,0]
+    socket_prev = [None,None,None,None,None,None,None,None,None,None]
+    tray_prev = [None,None,None,None,None,None,None,None,None,None]
+    tool_enable = [False,False,False,False,False,False,False,False,False,False]
+    tray_status = [False,False,False,False,False,False,False,False,False,False]
+
+    tool_enable_prev = [None,None,None,None,None,None,None,None,None,None]
     
     #for tray in range(len(socket_tray_enable)): #Clear LED Off==============================
     for tray in range(1): #Clear LED Off==============================
@@ -263,13 +265,21 @@ def main():
         # else:
         #     blink = True
             
-        time.sleep(0.1)
+        time.sleep(0.005)
 
         #Read Tray Sensor =============================
         for tray in range(len(socket_tray_enable)): 
             if socket_tray_enable[tray] is True:
                 socket_tray_sensor[tray] = tray_modbus.readSocketTraySensor(tray)
-                
+
+
+                if socket_tray_sensor[tray][0] != -1 :
+                    tray_status[tray] = True
+                    print("tray>>:", tray+ 1 , " = " , socket_tray_sensor[tray] , " OK")
+                else:
+                    tray_status[tray] = False
+                    print("tray>>:", tray+ 1 , " = " , socket_tray_sensor[tray] , " ERR")
+
         for tray in range(len(socket_tray_enable)): #Clear LED Off==============================
             for socket in range(8):
                 socket_tray_led[tray][socket] = socket_tray_led_color_off
@@ -453,7 +463,8 @@ def main():
                 if tool_enable[tools_id] is True:
                     try:
                         _tools.enableTool()
-                        print(" tool ", tools_id + 1, " enableTool")
+                        if bool(res_bypass) == False:
+                            print(" tool ", tools_id + 1, " enableTool")
                     except:
                         print("enableTool error")
                         pass
@@ -482,21 +493,29 @@ def main():
                         step_size = linking_group_batch_size
 
                         # print("Tools ", i + 1 ," = ",tool_enable[i] , " " , step_run + 1 , " " , step_size, " " , res_steps_socket[step_run][1])
-
-                print(current_time)
-                print("PROX > 1 = Socket Detect / 0 = No Socket")
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][0],socket_tray_sensor[tray][1],socket_tray_sensor[tray][2],socket_tray_sensor[tray][3]))
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][4],socket_tray_sensor[tray][5],socket_tray_sensor[tray][6],socket_tray_sensor[tray][7]))
-                print("LED > 11 = Return | 1 = NoSocket | 3 = Picked | 33 = Pickup | 2 = Normal")
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][0],socket_tray_led[tray][1],socket_tray_led[tray][2],socket_tray_led[tray][3]))
-                print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][4],socket_tray_led[tray][5],socket_tray_led[tray][6],socket_tray_led[tray][7]))
-                print("==============================")
-                    
-                if list(socket_tray_led_prev[tray]) != list(socket_tray_led[tray]):
-                    #print(tray," write = ",socket_tray_led[tray])
+                
+                # print(current_time)
+                # print("tray>>:", tray+ 1 , " = " , socket_tray_sensor[tray])
+                # print("PROX > 1 = Socket Detect / 0 = No Socket")
+                # print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][0],socket_tray_sensor[tray][1],socket_tray_sensor[tray][2],socket_tray_sensor[tray][3]))
+                # print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_sensor[tray][4],socket_tray_sensor[tray][5],socket_tray_sensor[tray][6],socket_tray_sensor[tray][7]))
+                # print("LED > 11 = Return | 1 = NoSocket | 3 = Picked | 33 = Pickup | 2 = Normal")
+                # print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][0],socket_tray_led[tray][1],socket_tray_led[tray][2],socket_tray_led[tray][3]))
+                # print("{:02X} , {:02X} , {:02X} , {:02X}".format(socket_tray_led[tray][4],socket_tray_led[tray][5],socket_tray_led[tray][6],socket_tray_led[tray][7]))
+                # print("==============================")
+                 
+                if tray_status[tray] is True:
                     tray_modbus.writeSocketTrayLED(tray,list(socket_tray_led[tray]))
+                    print("tray>>:", tray+ 1 ," write = ", socket_tray_led[tray])
+
+                if list(socket_tray_led_prev[tray]) != list(socket_tray_led[tray]) and tray_status[tray] is True:
+                    #print("tray>>:", tray+ 1 ," write = ", socket_tray_led[tray])
+                    #tray_modbus.writeSocketTrayLED(tray,list(socket_tray_led[tray]))
                     a = list(socket_tray_led[tray])
                     socket_tray_led_prev[tray] = a
+
+        print("==============================")
+
     
 if __name__=='__main__':
     main()

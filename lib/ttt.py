@@ -204,32 +204,32 @@ class TrayModbusV2():
     
     
         
-# def main():
-#     tray_modbus = TrayModbusV2(
-#         port='/dev/ttyS0', 
-#         device=0x01, 
-#         baudrate=19200, 
-#         bytesize = 8, 
-#         parity=serial.PARITY_NONE, 
-#         stopbits=1, 
-#         timeout=0.5
-#     )
-#     count = 0
-#     while True:
-#         print("tray>>:", count)
-#         data = tray_modbus.readSocketTraySensor(count)
-#         print(data)
-#         time.sleep(0.1)
-#         count += 1
-#         if count >= 4:
-#             count = 0
-#             time.sleep(0.5)
+def main():
+    tray_modbus = TrayModbusV2(
+        port='/dev/ttyS0', 
+        device=0x01, 
+        baudrate=19200, 
+        bytesize = 8, 
+        parity=serial.PARITY_NONE, 
+        stopbits=1, 
+        timeout=0.5
+    )
+    count = 0
+    while True:
+        print("tray>>:", count)
+        data = tray_modbus.readSocketTraySensor(count)
+        print(data)
+        time.sleep(0.1)
+        count += 1
+        if count >= 4:
+            count = 0
+            time.sleep(0.5)
             
     
-#     while True:
-#         print(tray_modbus.readSocketTraySensor(1))
-#         time.sleep(0.1)
+    while True:
+        print(tray_modbus.readSocketTraySensor(1))
+        time.sleep(0.1)
     
 
-# if __name__=='__main__':
-#     main()
+if __name__=='__main__':
+    main()
