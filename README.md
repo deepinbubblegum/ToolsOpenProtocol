@@ -1,0 +1,1 @@
+https://sodocumentation.net/pyqt/topic/2775/using-threads-with-pyqt
