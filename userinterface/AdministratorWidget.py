@@ -14,8 +14,8 @@ class AdministratorWidget(QWidget):
         lay.addLayout(hlay)
         lay.addStretch()
 
-        label_exit = QLabel("Exit")
-        exitButton = QPushButton("Exit")
+        label_exit = QLabel("Process")
+        exitButton = QPushButton("Restart")
         exitButton.clicked.connect(self.on_click_exit)
 
         hlay.addWidget(label_exit)

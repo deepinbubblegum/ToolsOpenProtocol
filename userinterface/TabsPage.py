@@ -24,7 +24,7 @@ class TabsWidget(QWidget):
         tabAdministrator = AdministratorWidget()           # Tab three
 
         # Add tabs
-        Tabs.addTab(tabOverview, "Overview")
+        # Tabs.addTab(tabOverview, "Overview")
         Tabs.addTab(tabGeneral, "General") #self.lang["tab_1_title"]) # Add "tab1" to the tabs holder "tabs"
         # Tabs.addTab(tabOptions, "Options") #self.lang["tab_2_title"]) # Add "tab2" to the tabs holder "tabs" 
         Tabs.addTab(tabAdministrator, "Administrator") #self.lang["tab_2_title"]) # Add "tab2" to the tabs holder "tabs" 

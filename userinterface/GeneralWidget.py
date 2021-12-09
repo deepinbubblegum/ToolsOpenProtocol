@@ -253,7 +253,7 @@ class GeneralWidget(QWidget):
         self.table.setHorizontalHeaderLabels(
             ["TRAY ID", "SOCKET ID", "COMMAND"])
         self.table.setAlternatingRowColors(True)
-        self.table.setMinimumSize(600, 280)
+        self.table.setMinimumSize(600, 240)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.resizeRowsToContents()
         self.table.scrollToBottom()
